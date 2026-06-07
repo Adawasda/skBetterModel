@@ -1,0 +1,70 @@
+package utils;
+
+import kr.toxicity.model.api.BetterModel;
+import kr.toxicity.model.api.bukkit.platform.BukkitAdapter;
+import kr.toxicity.model.api.tracker.EntityTracker;
+import kr.toxicity.model.api.tracker.EntityTrackerRegistry;
+import kr.toxicity.model.api.tracker.ModelScaler;
+import kr.toxicity.model.api.tracker.TrackerUpdateAction;
+
+import org.bukkit.entity.Entity;
+
+public class EntityTrackerController {
+
+    private final EntityTracker tracker;
+
+    public EntityTrackerController(Entity entity) {
+        EntityTrackerRegistry registry = EntityTrackerRegistry.registry(entity.getUniqueId());  
+        if (registry != null) {  
+            this.tracker = registry.first();  
+        }  else {
+            tracker = null;
+        }
+    }
+
+
+    public EntityTrackerController(Entity entity, String model) {
+        this.tracker = BetterModel.model(model)
+                .map(r -> r.getOrCreate(BukkitAdapter.adapt(entity)))
+                .orElse(null);
+    }
+
+    public EntityTrackerController(EntityTracker tracker) {
+        this.tracker = tracker;
+    }
+
+
+    public EntityTracker getTracker() {
+        return tracker;
+    }
+
+    public void setScale(float scale) {
+        if (tracker == null) return;
+        tracker.scaler(ModelScaler.value(scale));
+    }
+
+    public void setBrightness(int block, int sky) {
+        if (tracker == null) return;
+        tracker.update(TrackerUpdateAction.brightness(block, sky));
+    }
+
+    public void setGlow(boolean glow) {
+        if (tracker == null) return;
+        tracker.update(TrackerUpdateAction.glow(glow));
+    }
+
+    public void setGlowColor(int color) {
+        if (tracker == null) return;
+        tracker.update(TrackerUpdateAction.glowColor(color));
+    }
+
+    public void setViewRange(int range) {
+        if (tracker == null) return;
+        tracker.update(TrackerUpdateAction.viewRange(range));
+    }
+
+    public void setTint(int color) {
+        if (tracker == null) return;
+        tracker.update(TrackerUpdateAction.tint(color));
+    }
+}
