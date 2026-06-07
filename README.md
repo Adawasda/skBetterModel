@@ -25,7 +25,7 @@
 
 ## Example: Creating an Entity Tracker
 
-    ```skript
+    ```
     command /testmodel <string>:
         trigger:
             spawn armor stand at player:
