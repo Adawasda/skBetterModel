@@ -1,70 +1,69 @@
-Вот минималистичный, чистый README на английском:
-
----
-
-````md
 # skBetterModel
 
-A simple Skript addon that adds syntax support for BetterModel.
+    Skript addon that adds shitty syntax support for BetterModel.
 
----
+    It allows you to create and control EntityTrackers directly inside Skript with simple, flexible syntax.
+
+
+    ## Requirements
+
+    - Skript 2.14+
+    - Java 21+
+    - Paper 1.19.4+ (recommended 1.20+ / 1.21+)
+
 
 ## Features
 
-- Create and manage BetterModel EntityTrackers inside Skript
-- Control model properties (scale, brightness, view range, tint)
-- Play animations with flexible syntax
-- Supports both Entity and EntityTracker inputs
+    skBetterModel provides a simple bridge between Skript and BetterModel API:
 
----
+    - Create EntityTrackers directly in Skript
+    - Attach models to entities
+    - Modify model properties (scale, brightness, view range, tint, glow, etc.)
+    - Control animations from Skript
+    - Store and reuse created trackers
+
 
 ## Example: Creating an Entity Tracker
 
-```skript
-command /testmodel <string>:
-    trigger:
-        spawn armor stand at player:
-            set {_e} to entity
+    ```skript
+    command /testmodel <string>:
+        trigger:
+            spawn armor stand at player:
+                set {_e} to entity
 
-        create entity tracker with model arg-1:
-            entity: {_e}
-            scale: vector(2, 1, 1)
-            brightness: 15
-            view range: 1000
-            tint: rgb(255, 255, 255)
+            create entity tracker with model arg-1:
+                entity: {_e}
+                scale: vector(2, 1, 1)
+                brightness: 15
+                view range: 1000
+                tint: rgb(255, 255, 255)
 
-        set {_tracker} to last created entity tracker
-        
-````
-
----
-
-## Playing Animations
-
-```text
-play [bm|bettermodel] animation %string% for %object%
-play [bm|bettermodel] animation %string% for %object% with play once
-
-play [bm|bettermodel] animation %string% for %entity%
-play [bm|bettermodel] animation %string% for %entity% with play once
-```
+            set {_tracker} to last created entity tracker
+    ````
 
 ---
+
+## Animations
+
+    ```text
+    play [bm|bettermodel] animation %string% for %object%
+    play [bm|bettermodel] animation %string% for %object% with play once
+
+    play [bm|bettermodel] animation %string% for %entity%
+    play [bm|bettermodel] animation %string% for %entity% with play once
+    ```
+
 
 ## Planned Features
 
-* Full EntityTracker property manipulation
-* ModelRenderer (Blueprint) editing support
-* RenderedBone control system
-* Advanced animation configuration system
-* Player animation support
-* More improvements and API expansions
+    * Full EntityTracker property editing from Skript
+    * ModelRenderer (Blueprint) support
+    * RenderedBone manipulation
+    * Advanced animation system
+    * Player animation support
+    * Performance optimizations
+    * More BetterModel API coverage
 
----
 
-## Notes
+This addon is in active development and may change frequently.
 
-This addon is still in development and may change frequently.
-
-```
-```
