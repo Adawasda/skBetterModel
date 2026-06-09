@@ -2,11 +2,13 @@ package utils;
 
 import kr.toxicity.model.api.BetterModel;
 import kr.toxicity.model.api.bukkit.platform.BukkitAdapter;
+import kr.toxicity.model.api.profile.ModelProfile;
 import kr.toxicity.model.api.tracker.EntityTracker;
 import kr.toxicity.model.api.tracker.EntityTrackerRegistry;
 import kr.toxicity.model.api.tracker.ModelScaler;
 import kr.toxicity.model.api.tracker.TrackerUpdateAction;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 
 public class EntityTrackerController {
@@ -27,6 +29,12 @@ public class EntityTrackerController {
         this.tracker = BetterModel.model(model)
                 .map(r -> r.getOrCreate(BukkitAdapter.adapt(entity)))
                 .orElse(null);
+    }
+
+    public EntityTrackerController(Entity entity, String model, OfflinePlayer player) {
+        this.tracker = BetterModel.limb(model)
+            .map(r -> r.getOrCreate(BukkitAdapter.adapt(entity), ModelProfile.of(player.getUniqueId())))
+            .orElse(null);
     }
 
     public EntityTrackerController(EntityTracker tracker) {
@@ -67,4 +75,5 @@ public class EntityTrackerController {
         if (tracker == null) return;
         tracker.update(TrackerUpdateAction.tint(color));
     }
+
 }

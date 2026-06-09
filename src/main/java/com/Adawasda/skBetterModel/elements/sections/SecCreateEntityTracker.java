@@ -2,6 +2,7 @@ package com.Adawasda.skBetterModel.elements.sections;
 
 import java.util.List;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
@@ -48,8 +49,7 @@ public class SecCreateEntityTracker extends Section {
     private Expression<Color> glowColorExpr;
     private Expression<Number> viewRangeExpr;
     private Expression<Color> tintExpr;
-
-
+    private Expression<Object> playerExpr;
     private static final EntryValidator validator = EntryValidator.builder()
             .addEntryData(new ExpressionEntryData<>("entity", null, true, Entity.class))
             .addEntryData(new ExpressionEntryData<>("scale", null, true, Vector.class))
@@ -58,6 +58,7 @@ public class SecCreateEntityTracker extends Section {
             .addEntryData(new ExpressionEntryData<>("glow color", null, true, Color.class))
             .addEntryData(new ExpressionEntryData<>("view range", null, true, Number.class))
             .addEntryData(new ExpressionEntryData<>("tint", null, true, Color.class))
+            .addEntryData(new ExpressionEntryData<>("player", null, true, Object.class))
             .build();
 
     public static void register(@NotNull SyntaxRegistry registry) {
@@ -100,7 +101,7 @@ public class SecCreateEntityTracker extends Section {
         glowColorExpr = (Expression<Color>) container.getOptional("glow color", Expression.class, true);
         viewRangeExpr = (Expression<Number>) container.getOptional("view range", Expression.class, true);
         tintExpr = (Expression<Color>) container.getOptional("tint", Expression.class, true);
-
+        playerExpr = (Expression<Object>) container.getOptional("player", Expression.class, true);
         
         return true;
     }
@@ -116,12 +117,16 @@ public class SecCreateEntityTracker extends Section {
 
         String model = modelName.getSingle(event);
         Entity entity = entityExpr.getSingle(event);
+        EntityTrackerController controller;
 
         if (model == null || entity == null)
             return;
 
-        EntityTrackerController controller =
-                new EntityTrackerController(entity, model);
+        if (playerExpr != null && playerExpr.getSingle(event) != null) 
+            controller = new EntityTrackerController(entity, model, (OfflinePlayer) playerExpr.getSingle(event));
+        else 
+            controller = new EntityTrackerController(entity, model);
+        
 
         if (scaleExpr != null && scaleExpr.getSingle(event) != null) {
             float scale = (float) scaleExpr.getSingle(event).getX();
@@ -150,7 +155,6 @@ public class SecCreateEntityTracker extends Section {
             Color c = tintExpr.getSingle(event);
             controller.setTint(utils.rgbToInt(c.getRed(), c.getGreen(), c.getBlue()));
         }
-
         lastCreatedEntityTracker = controller.getTracker();
     }
 }
