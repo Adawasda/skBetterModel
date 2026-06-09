@@ -41,29 +41,33 @@
             set {_tracker} to last created entity tracker
     ````
 
----
 
 ## Animations
 
-    ```text
-    play [bm|bettermodel] animation %string% for %object%
-    play [bm|bettermodel] animation %string% for %object% with play once
+## Playing Animations
 
-    play [bm|bettermodel] animation %string% for %entity%
-    play [bm|bettermodel] animation %string% for %entity% with play once
-    ```
+```text
+play [bm|bettermodel] animation %string% for %object%
+play [bm|bettermodel] animation %string% for %object% with play once
 
+play [bm|bettermodel] animation %string% for %entity%
+play [bm|bettermodel] animation %string% for %entity% with play once
+```
+
+---
 
 ## Planned Features
 
-    * Full EntityTracker property editing from Skript
-    * ModelRenderer (Blueprint) support
-    * RenderedBone manipulation
-    * Advanced animation system
-    * Player animation support
-    * Performance optimizations
-    * More BetterModel API coverage
+* Full EntityTracker property manipulation
+* ModelRenderer (Blueprint) editing support
+* RenderedBone control system
+* Advanced animation configuration system
+* Player animation support
+* More improvements and API expansions
 
+---
 
-This addon is in active development and may change frequently.
+## Notes
+
+This addon is still in development and may change frequently.
 
