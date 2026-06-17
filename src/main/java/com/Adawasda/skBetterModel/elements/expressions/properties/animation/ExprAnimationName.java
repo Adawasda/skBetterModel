@@ -12,7 +12,7 @@ import kr.toxicity.model.api.animation.RunningAnimation;
 public class ExprAnimationName extends SimplePropertyExpression<RunningAnimation, String> {
 
 	public static void register(@NotNull SyntaxRegistry registry) {
-        PropertyExpression.register(ExprAnimationName.class, String.class, "animation name", "RunningAnimation");
+        PropertyExpression.register(ExprAnimationName.class, String.class, "animation name", "Object");
 	}
 
     @Override
