@@ -18,6 +18,7 @@ import com.Adawasda.skBetterModel.elements.expressions.ExprActiveAnimation;
 import com.Adawasda.skBetterModel.elements.expressions.ExprAllEntityTrackers;
 import com.Adawasda.skBetterModel.elements.expressions.ExprAllModels;
 import com.Adawasda.skBetterModel.elements.expressions.ExprLastEntityTracker;
+import com.Adawasda.skBetterModel.elements.expressions.properties.animation.ExprAnimationName;
 import com.Adawasda.skBetterModel.elements.sections.SecCreateEntityTracker;
 
 @SuppressWarnings("unused")
@@ -85,6 +86,8 @@ public class skBetterModel extends JavaPlugin implements AddonModule {
 		ExprAllEntityTrackers.register(registry);
 		ExprAllModels.register(registry);
 		ExprActiveAnimation.register(registry);
+		// Properties
+		ExprAnimationName.register(registry);
 
 		// Register conditions
 

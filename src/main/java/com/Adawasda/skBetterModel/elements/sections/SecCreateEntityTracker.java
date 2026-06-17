@@ -58,7 +58,7 @@ public class SecCreateEntityTracker extends Section {
             .addEntryData(new ExpressionEntryData<>("glow color", null, true, Color.class))
             .addEntryData(new ExpressionEntryData<>("view range", null, true, Number.class))
             .addEntryData(new ExpressionEntryData<>("tint", null, true, Color.class))
-            .addEntryData(new ExpressionEntryData<>("player", null, true, Object.class))
+            .addEntryData(new ExpressionEntryData<>("player", null, true, OfflinePlayer.class))
             .build();
 
     public static void register(@NotNull SyntaxRegistry registry) {
@@ -126,6 +126,7 @@ public class SecCreateEntityTracker extends Section {
             controller = new EntityTrackerController(entity, model, (OfflinePlayer) playerExpr.getSingle(event));
         else 
             controller = new EntityTrackerController(entity, model);
+        
         
 
         if (scaleExpr != null && scaleExpr.getSingle(event) != null) {

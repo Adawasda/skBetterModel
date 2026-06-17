@@ -27,8 +27,8 @@ public class ExprActiveAnimation extends SimpleExpression<RunningAnimation> {
 		registry.register(SyntaxRegistry.EXPRESSION, DefaultSyntaxInfos.Expression.builder(ExprActiveAnimation.class, RunningAnimation.class)
 				.supplier(ExprActiveAnimation::new)
 				.addPatterns(
-                    "[active] animation of %object%",
-                    "[active] animation of %entity%"
+                    "[active|running] animation of %object%",
+                    "[active|running] animation of %entity%"
 
                 ) // [example] is optional in syntax
 				.build());

@@ -23,16 +23,18 @@ public class EffPlayAnimation extends Effect {
     private Expression<Entity> entity;
     private int matchedPattern;
     private EntityTrackerController controller;
+    private Expression<Boolean> isForcedExpr;
+    private Boolean isForced;
 
 	public static void register(@NotNull SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EFFECT, SyntaxInfo.builder(EffPlayAnimation.class)
 				.supplier(EffPlayAnimation::new)
 				.addPatterns(
-                    "play [the] [bm|bettermodel] animation %string% [for|to] %object%",
-                    "play [the] [bm|bettermodel] animation %string% [for|to] %object% with play once",
+                    "play [the] [bm|bettermodel] animation %string% [for|to] %object% [with force %boolean%]",
+                    "play [the] [bm|bettermodel] animation %string% [for|to] %object% with play once [with force %boolean%]",
 
-                    "play [the] [bm|bettermodel] animation %string% [for|to] %entity%",
-                    "play [the] [bm|bettermodel] animation %string% [for|to] %entity% with play once"
+                    "play [the] [bm|bettermodel] animation %string% [for|to] %entity% [with force %boolean]",
+                    "play [the] [bm|bettermodel] animation %string% [for|to] %entity% with play once [with force %boolean%]"
                 )
 				.build());
 	}
@@ -47,6 +49,8 @@ public class EffPlayAnimation extends Effect {
             this.entity = (Expression<Entity>) expressions[1];
         }
 
+        isForcedExpr = (Expression<Boolean>) expressions[2];
+
         
         this.matchedPattern = matchedPattern;
         return true;
@@ -59,6 +63,9 @@ public class EffPlayAnimation extends Effect {
 
     @Override
     protected void execute(Event event) {
+        if (isForcedExpr != null && isForcedExpr.getSingle(event) != null) 
+            isForced = isForcedExpr.getSingle(event);
+
         if (matchedPattern == 0 || matchedPattern == 1) {
             this.controller = new EntityTrackerController((EntityTracker) this.entityTracker.getSingle(event));
         } else {

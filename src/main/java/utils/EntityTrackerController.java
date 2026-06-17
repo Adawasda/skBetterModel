@@ -1,6 +1,7 @@
 package utils;
 
 import kr.toxicity.model.api.BetterModel;
+import kr.toxicity.model.api.animation.RunningAnimation;
 import kr.toxicity.model.api.bukkit.platform.BukkitAdapter;
 import kr.toxicity.model.api.profile.ModelProfile;
 import kr.toxicity.model.api.tracker.EntityTracker;
@@ -11,9 +12,12 @@ import kr.toxicity.model.api.tracker.TrackerUpdateAction;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 
+import com.Adawasda.skBetterModel.skBetterModel;
+
 public class EntityTrackerController {
 
     private final EntityTracker tracker;
+    private final skBetterModel plugin = skBetterModel.getInstance();
 
     public EntityTrackerController(Entity entity) {
         EntityTrackerRegistry registry = EntityTrackerRegistry.registry(entity.getUniqueId());  
@@ -74,6 +78,11 @@ public class EntityTrackerController {
     public void setTint(int color) {
         if (tracker == null) return;
         tracker.update(TrackerUpdateAction.tint(color));
+    }
+
+    public RunningAnimation getRunningAnimation() {
+        if (tracker == null) return null;
+        return tracker.getPipeline().runningAnimation();
     }
 
 }
