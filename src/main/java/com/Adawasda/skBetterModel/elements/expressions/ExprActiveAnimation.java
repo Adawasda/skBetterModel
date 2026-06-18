@@ -19,20 +19,42 @@ import utils.EntityTrackerController;
 @SuppressWarnings("unchecked")
 public class ExprActiveAnimation extends SimpleExpression<RunningAnimation> {
 
-    private Expression<Object> entityTrackerExpr;
-    private Expression<Entity> entityExpr;
-    int matchedPattern;
+    private Expression<Object> expr;
 
-	public static void register(@NotNull SyntaxRegistry registry) {
-		registry.register(SyntaxRegistry.EXPRESSION, DefaultSyntaxInfos.Expression.builder(ExprActiveAnimation.class, RunningAnimation.class)
-				.supplier(ExprActiveAnimation::new)
-				.addPatterns(
-                    "[active|running] animation of %object%",
-                    "[active|running] animation of %entity%"
+    public static void register(@NotNull SyntaxRegistry registry) {
+        registry.register(SyntaxRegistry.EXPRESSION, DefaultSyntaxInfos.Expression.builder(ExprActiveAnimation.class, RunningAnimation.class)
+                .supplier(ExprActiveAnimation::new)
+                .addPatterns("[active|running] animation of %object%")
+                .build());
+    }
 
-                ) // [example] is optional in syntax
-				.build());
-	}
+    @Override
+    public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+        this.expr = (Expression<Object>) expressions[0];
+        return true;
+    }
+
+    @Override
+    protected RunningAnimation @Nullable [] get(Event event) {
+        Object obj = expr.getSingle(event);
+        if (obj == null) return null;
+
+        EntityTracker tracker;
+        if (obj instanceof EntityTracker entityTracker) {
+            tracker = entityTracker;
+        } else if (obj instanceof Entity entity) {
+            tracker = new EntityTrackerController(entity).getTracker();
+        } else {
+            return null;
+        }
+
+        if (tracker == null) return null;
+
+        RunningAnimation animation = tracker.getPipeline().runningAnimation();
+        if (animation == null) return null;
+
+        return new RunningAnimation[]{animation};
+    }
 
     @Override
     public boolean isSingle() {
@@ -40,38 +62,12 @@ public class ExprActiveAnimation extends SimpleExpression<RunningAnimation> {
     }
 
     @Override
-    public Class getReturnType() {
+    public Class<? extends RunningAnimation> getReturnType() {
         return RunningAnimation.class;
     }
 
     @Override
-    public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-        this.matchedPattern = matchedPattern;
-        
-        switch (matchedPattern) {
-            case 0 -> this.entityTrackerExpr = (Expression<Object>) expressions[0];
-            case 1 -> this.entityExpr = (Expression<Entity>) expressions[0];
-        }
-        return true;
-    }
-
-    @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "active animation of " + this.entityTrackerExpr.toString(event, debug);
+        return "active animation of " + expr.toString(event, debug);
     }
-
-    @Override
-    protected RunningAnimation @Nullable [] get(Event event) {
-        EntityTracker entityTracker;
-        switch (matchedPattern) {
-            case 1 -> entityTracker = (EntityTracker) this.entityTrackerExpr.getSingle(event);
-            default -> entityTracker = new EntityTrackerController(entityExpr.getSingle(event)).getTracker();
-        }
-        
-        
-        RunningAnimation animation = entityTracker.getPipeline().runningAnimation();
-        return new RunningAnimation[]{animation};
-
-    }
-    
 }

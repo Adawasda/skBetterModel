@@ -30,11 +30,11 @@ public class EffPlayAnimation extends Effect {
 		registry.register(SyntaxRegistry.EFFECT, SyntaxInfo.builder(EffPlayAnimation.class)
 				.supplier(EffPlayAnimation::new)
 				.addPatterns(
-                    "play [the] [bm|bettermodel] animation %string% [for|to] %object% [with force %boolean%]",
-                    "play [the] [bm|bettermodel] animation %string% [for|to] %object% with play once [with force %boolean%]",
+                    "play [the] [bm|bettermodel] animation %string% [for|to] %object% [with force %-boolean%]",
+                    "play [the] [bm|bettermodel] animation %string% [for|to] %object% with play once [with force %-boolean%]",
 
-                    "play [the] [bm|bettermodel] animation %string% [for|to] %entity% [with force %boolean]",
-                    "play [the] [bm|bettermodel] animation %string% [for|to] %entity% with play once [with force %boolean%]"
+                    "play [the] [bm|bettermodel] animation %string% [for|to] %entity% [with force %-boolean%]",
+                    "play [the] [bm|bettermodel] animation %string% [for|to] %entity% with play once [with force %-boolean%]"
                 )
 				.build());
 	}
@@ -58,28 +58,38 @@ public class EffPlayAnimation extends Effect {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "play animation " + this.animationName + " to " + this.entityTracker.toString();
+        String target = entityTracker != null ? entityTracker.toString(event, debug) : entity.toString(event, debug);
+        return "play animation " + animationName.toString(event, debug) + " to " + target;
     }
 
     @Override
     protected void execute(Event event) {
         if (isForcedExpr != null && isForcedExpr.getSingle(event) != null) 
             isForced = isForcedExpr.getSingle(event);
+        else 
+            isForced = false;
 
         if (matchedPattern == 0 || matchedPattern == 1) {
-            this.controller = new EntityTrackerController((EntityTracker) this.entityTracker.getSingle(event));
+            Object obj = this.entityTracker.getSingle(event);
+            if (obj instanceof EntityTracker tracker) {
+                this.controller = new EntityTrackerController(tracker);
+            } else if (obj instanceof Entity entity) {
+                this.controller = new EntityTrackerController(entity);
+            } else {
+                throw new RuntimeException("Expected an EntityTracker or Entity, got: " + (obj == null ? "null" : obj.getClass().getName()));
+            }
         } else {
             this.controller = new EntityTrackerController(this.entity.getSingle(event));
         }
 
         if (this.controller.getTracker() == null) {
-            throw new RuntimeException("No entity tracker found for " + this.entity.toString(event, true));
+            throw new RuntimeException("No entity tracker found for entity");
         }
 
         if (matchedPattern == 0 || matchedPattern == 2) {
-            controller.getTracker().animate(this.animationName.getSingle(event), AnimationModifier.DEFAULT);
+            controller.animate(this.animationName.getSingle(event), AnimationModifier.DEFAULT, isForced);
         } else {
-            controller.getTracker().animate(this.animationName.getSingle(event), AnimationModifier.DEFAULT_WITH_PLAY_ONCE);
+            controller.animate(this.animationName.getSingle(event), AnimationModifier.DEFAULT_WITH_PLAY_ONCE, isForced);
         }
     }
     

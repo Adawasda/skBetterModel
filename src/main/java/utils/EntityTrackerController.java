@@ -1,6 +1,7 @@
 package utils;
 
 import kr.toxicity.model.api.BetterModel;
+import kr.toxicity.model.api.animation.AnimationModifier;
 import kr.toxicity.model.api.animation.RunningAnimation;
 import kr.toxicity.model.api.bukkit.platform.BukkitAdapter;
 import kr.toxicity.model.api.profile.ModelProfile;
@@ -83,6 +84,13 @@ public class EntityTrackerController {
     public RunningAnimation getRunningAnimation() {
         if (tracker == null) return null;
         return tracker.getPipeline().runningAnimation();
+    }
+
+    public void animate(String animationName, AnimationModifier modifier, Boolean forced) {
+        if (!forced && getRunningAnimation() != null && getRunningAnimation().name().equals(animationName))
+            return;
+
+        tracker.animate(animationName, modifier);
     }
 
 }
