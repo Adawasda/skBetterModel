@@ -18,7 +18,7 @@ public class EvtModelSpawnAtPlayer extends SkriptEvent {
 		registry.register(BukkitSyntaxInfos.Event.KEY, BukkitSyntaxInfos.Event.builder(EvtModelSpawnAtPlayer.class, "bettermodel model spawn at player event")
 				.supplier(EvtModelSpawnAtPlayer::new)
 				.addEvent(BetterModelBukkitEvent.class)
-				.addPatterns("(bm|bettermodel) model spawn[ing] [at player]")
+				.addPatterns("[bm|bettermodel] model spawn[ing] [at player]")
 				.build());
 	}
 

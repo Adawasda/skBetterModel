@@ -18,7 +18,7 @@ public class EvtEntityTrackerHide extends SkriptEvent {
 		registry.register(BukkitSyntaxInfos.Event.KEY, BukkitSyntaxInfos.Event.builder(EvtEntityTrackerHide.class, "bettermodel entity tracker hide event")
 				.supplier(EvtEntityTrackerHide::new)
 				.addEvent(BetterModelBukkitEvent.class)
-				.addPatterns("(bm|bettermodel) [entity] tracker hide [for player]")
+				.addPatterns("[bm|bettermodel] [entity] tracker hide [for player]")
 				.build());
 	}
 

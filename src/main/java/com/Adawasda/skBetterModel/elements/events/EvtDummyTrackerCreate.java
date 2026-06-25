@@ -18,7 +18,7 @@ public class EvtDummyTrackerCreate extends SkriptEvent {
 		registry.register(BukkitSyntaxInfos.Event.KEY, BukkitSyntaxInfos.Event.builder(EvtDummyTrackerCreate.class, "bettermodel dummy tracker create")
 				.supplier(EvtDummyTrackerCreate::new)
 				.addEvent(BetterModelBukkitEvent.class)
-				.addPatterns("(bm|bettermodel) dummy [tracker] (create|spawn)")
+				.addPatterns("[bm|bettermodel] dummy [tracker] (create|spawn)")
 				.build());
 	}
 

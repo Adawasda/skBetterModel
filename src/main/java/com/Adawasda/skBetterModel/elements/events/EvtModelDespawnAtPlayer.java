@@ -18,7 +18,7 @@ public class EvtModelDespawnAtPlayer extends SkriptEvent {
 		registry.register(BukkitSyntaxInfos.Event.KEY, BukkitSyntaxInfos.Event.builder(EvtModelDespawnAtPlayer.class, "bettermodel model despawn at player event")
 				.supplier(EvtModelDespawnAtPlayer::new)
 				.addEvent(BetterModelBukkitEvent.class)
-				.addPatterns("(bm|bettermodel) model despawn[ing] [at player]")
+				.addPatterns("[bm|bettermodel] model despawn[ing] [at player]")
 				.build());
 	}
     

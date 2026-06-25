@@ -27,7 +27,9 @@ import com.Adawasda.skBetterModel.elements.expressions.ExprModelAnimations;
 import com.Adawasda.skBetterModel.elements.expressions.ExprLastEntityTracker;
 import com.Adawasda.skBetterModel.elements.expressions.properties.animation.ExprAnimationName;
 import com.Adawasda.skBetterModel.elements.sections.SecCreateEntityTracker;
+import com.Adawasda.skBetterModel.elements.types.TypeBlueprintAnimation;
 import com.Adawasda.skBetterModel.elements.types.TypeEntityTracker;
+import com.Adawasda.skBetterModel.elements.types.TypeModelRenderer;
 import com.Adawasda.skBetterModel.elements.types.TypeRunningAnimation;
 
 @SuppressWarnings("unused")
@@ -86,6 +88,8 @@ public class skBetterModel extends JavaPlugin implements AddonModule {
 	public void init(@NotNull SkriptAddon addon) {
 		TypeRunningAnimation.register();
 		TypeEntityTracker.register();
+		TypeModelRenderer.register();
+		TypeBlueprintAnimation.register();
 	}
 
 	@Override

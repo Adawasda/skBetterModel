@@ -19,7 +19,7 @@ public class EvtEntityTrackerCreate extends SkriptEvent {
 		registry.register(BukkitSyntaxInfos.Event.KEY, BukkitSyntaxInfos.Event.builder(EvtEntityTrackerCreate.class, "bettermodel entity tracker create")
 				.supplier(EvtEntityTrackerCreate::new)
 				.addEvent(BetterModelBukkitEvent.class)
-				.addPatterns("(bm|bettermodel) [entity] tracker (create|spawn)")
+				.addPatterns("[bm|bettermodel] [entity] tracker (create|spawn)")
 				.build());
 	}
     @Override

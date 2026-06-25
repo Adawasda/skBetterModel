@@ -18,7 +18,7 @@ public class EvtEntityTrackerShow extends SkriptEvent {
 		registry.register(BukkitSyntaxInfos.Event.KEY, BukkitSyntaxInfos.Event.builder(EvtEntityTrackerShow.class, "bettermodel entity tracker show event")
 				.supplier(EvtEntityTrackerShow::new)
 				.addEvent(BetterModelBukkitEvent.class)
-				.addPatterns("(bm|bettermodel) [entity] tracker show [for player]")
+				.addPatterns("[bm|bettermodel] [entity] tracker show [for player]")
 				.build());
 	}
 
