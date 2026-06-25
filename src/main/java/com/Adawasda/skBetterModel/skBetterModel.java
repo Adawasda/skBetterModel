@@ -14,9 +14,16 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 import com.Adawasda.skBetterModel.elements.effects.EffPlayAnimation;
 import com.Adawasda.skBetterModel.elements.events.EvtBMReloadEnd;
 import com.Adawasda.skBetterModel.elements.events.EvtBMReloadStart;
+import com.Adawasda.skBetterModel.elements.events.EvtDummyTrackerCreate;
+import com.Adawasda.skBetterModel.elements.events.EvtEntityTrackerCreate;
+import com.Adawasda.skBetterModel.elements.events.EvtEntityTrackerHide;
+import com.Adawasda.skBetterModel.elements.events.EvtEntityTrackerShow;
+import com.Adawasda.skBetterModel.elements.events.EvtModelDespawnAtPlayer;
+import com.Adawasda.skBetterModel.elements.events.EvtModelSpawnAtPlayer;
 import com.Adawasda.skBetterModel.elements.expressions.ExprActiveAnimation;
 import com.Adawasda.skBetterModel.elements.expressions.ExprAllEntityTrackers;
-import com.Adawasda.skBetterModel.elements.expressions.ExprAllModels;
+import com.Adawasda.skBetterModel.elements.expressions.ExprAllModelRenderers;
+import com.Adawasda.skBetterModel.elements.expressions.ExprModelAnimations;
 import com.Adawasda.skBetterModel.elements.expressions.ExprLastEntityTracker;
 import com.Adawasda.skBetterModel.elements.expressions.properties.animation.ExprAnimationName;
 import com.Adawasda.skBetterModel.elements.sections.SecCreateEntityTracker;
@@ -88,8 +95,10 @@ public class skBetterModel extends JavaPlugin implements AddonModule {
 		// Register expressions
 		ExprLastEntityTracker.register(registry);
 		ExprAllEntityTrackers.register(registry);
-		ExprAllModels.register(registry);
+		ExprModelAnimations.register(registry);
 		ExprActiveAnimation.register(registry);
+		ExprAllModelRenderers.register(registry);
+
 		// Properties
 		ExprAnimationName.register(registry);
 
@@ -101,6 +110,13 @@ public class skBetterModel extends JavaPlugin implements AddonModule {
 		// Register events
 		EvtBMReloadStart.register(registry);
 		EvtBMReloadEnd.register(registry);
+		EvtDummyTrackerCreate.register(registry);
+		EvtEntityTrackerCreate.register(registry);
+		EvtEntityTrackerHide.register(registry);
+		EvtEntityTrackerShow.register(registry);
+		EvtModelSpawnAtPlayer.register(registry);
+		EvtModelDespawnAtPlayer.register(registry);
+
 
 		// Register sections
 		SecCreateEntityTracker.register(registry);

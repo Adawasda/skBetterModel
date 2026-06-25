@@ -4,14 +4,19 @@ import kr.toxicity.model.api.BetterModel;
 import kr.toxicity.model.api.animation.AnimationModifier;
 import kr.toxicity.model.api.animation.RunningAnimation;
 import kr.toxicity.model.api.bukkit.platform.BukkitAdapter;
+import kr.toxicity.model.api.data.blueprint.BlueprintAnimation;
 import kr.toxicity.model.api.profile.ModelProfile;
 import kr.toxicity.model.api.tracker.EntityTracker;
 import kr.toxicity.model.api.tracker.EntityTrackerRegistry;
 import kr.toxicity.model.api.tracker.ModelScaler;
 import kr.toxicity.model.api.tracker.TrackerUpdateAction;
 
+import java.util.Map;
+import java.util.Set;
+
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
+import org.joml.Vector3f;
 
 import com.Adawasda.skBetterModel.skBetterModel;
 
@@ -93,4 +98,15 @@ public class EntityTrackerController {
         tracker.animate(animationName, modifier);
     }
 
+    public void setOffset(Vector3f offset) {
+        if (tracker == null) return;
+        return;
+        //!TODO
+    }
+
+    public Map<String, BlueprintAnimation> getAnimations() {
+        if (tracker == null) return null;
+        return tracker.renderer().animations();
+    }
+ 
 }
