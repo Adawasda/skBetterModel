@@ -32,6 +32,7 @@ import kr.toxicity.model.api.tracker.EntityTracker;
 import kr.toxicity.model.api.tracker.ModelScaler;
 import kr.toxicity.model.api.tracker.TrackerUpdateAction;
 import utils.EntityTrackerController;
+import utils.skBetterModelConfig;
 import utils.utils;
 
 @SuppressWarnings("unused")
@@ -50,6 +51,15 @@ public class SecCreateEntityTracker extends Section {
     private Expression<Number> viewRangeExpr;
     private Expression<Color> tintExpr;
     private Expression<Object> playerExpr;
+    private Expression<Number> minBodyExpr;
+    private Expression<Number> maxBodyExpr;
+    private Expression<Number> minHeadExpr;
+    private Expression<Number> maxHeadExpr;
+    private Expression<Boolean> bodyUnevenExpr;
+    private Expression<Boolean> headUnevenExpr;
+    private Expression<Number> rotationDurationExpr;
+    private Expression<Number> rotationDelayExpr;
+
     private static final EntryValidator validator = EntryValidator.builder()
             .addEntryData(new ExpressionEntryData<>("entity", null, true, Entity.class))
             .addEntryData(new ExpressionEntryData<>("scale", null, true, Vector.class))
@@ -59,6 +69,17 @@ public class SecCreateEntityTracker extends Section {
             .addEntryData(new ExpressionEntryData<>("view range", null, true, Number.class))
             .addEntryData(new ExpressionEntryData<>("tint", null, true, Color.class))
             .addEntryData(new ExpressionEntryData<>("player", null, true, OfflinePlayer.class))
+
+            // Body Rotator
+            .addEntryData(new ExpressionEntryData<>("min body", null, true, Number.class))
+            .addEntryData(new ExpressionEntryData<>("max body", null, true, Number.class))
+            .addEntryData(new ExpressionEntryData<>("min head", null, true, Number.class))
+            .addEntryData(new ExpressionEntryData<>("max head", null, true, Number.class))
+            .addEntryData(new ExpressionEntryData<>("body uneven", null, true, Boolean.class))
+            .addEntryData(new ExpressionEntryData<>("head uneven", null, true, Boolean.class))
+            .addEntryData(new ExpressionEntryData<>("rotation duration", null, true, Number.class))
+            .addEntryData(new ExpressionEntryData<>("rotation delay", null, true, Number.class))
+
             .build();
 
     public static void register(@NotNull SyntaxRegistry registry) {
@@ -103,6 +124,16 @@ public class SecCreateEntityTracker extends Section {
         tintExpr = (Expression<Color>) container.getOptional("tint", Expression.class, true);
         playerExpr = (Expression<Object>) container.getOptional("player", Expression.class, true);
         
+        // Body Rotator
+        minBodyExpr = (Expression<Number>) container.getOptional("min body", Expression.class, true);
+        maxBodyExpr = (Expression<Number>) container.getOptional("max body", Expression.class, true);
+        minHeadExpr = (Expression<Number>) container.getOptional("min head", Expression.class, true);
+        maxHeadExpr = (Expression<Number>) container.getOptional("max head", Expression.class, true);
+        bodyUnevenExpr = (Expression<Boolean>) container.getOptional("body uneven", Expression.class, true);
+        headUnevenExpr = (Expression<Boolean>) container.getOptional("head uneven", Expression.class, true);
+        rotationDurationExpr = (Expression<Number>) container.getOptional("rotation duration", Expression.class, true);
+        rotationDelayExpr = (Expression<Number>) container.getOptional("rotation delay", Expression.class, true);
+
         return true;
     }
 
@@ -117,7 +148,19 @@ public class SecCreateEntityTracker extends Section {
 
         String model = modelName.getSingle(event);
         Entity entity = entityExpr.getSingle(event);
+        skBetterModelConfig config = skBetterModelConfig.get();
+        
+        float minBody = minBodyExpr != null ? minBodyExpr.getSingle(event).floatValue() : config.getMinBody();
+        float maxBody = maxBodyExpr != null ? maxBodyExpr.getSingle(event).floatValue() : config.getMaxBody();
+        float minHead = minHeadExpr != null ? minHeadExpr.getSingle(event).floatValue() : config.getMinHead();
+        float maxHead = maxHeadExpr != null ? maxHeadExpr.getSingle(event).floatValue() : config.getMaxHead();
+        boolean bodyUneven = bodyUnevenExpr != null ? bodyUnevenExpr.getSingle(event).booleanValue() : config.isBodyUneven();
+        boolean headUneven = headUnevenExpr != null ? headUnevenExpr.getSingle(event).booleanValue() : config.isHeadUneven();
+        int rotationDuration = rotationDurationExpr != null ? rotationDurationExpr.getSingle(event).intValue() : config.getRotationDuration();
+        int rotationDelay = rotationDelayExpr != null ? rotationDelayExpr.getSingle(event).intValue() : config.getRotationDelay();
+
         EntityTrackerController controller;
+
 
         if (model == null || entity == null)
             return;
@@ -156,6 +199,18 @@ public class SecCreateEntityTracker extends Section {
             Color c = tintExpr.getSingle(event);
             controller.setTint(utils.rgbToInt(c.getRed(), c.getGreen(), c.getBlue()));
         }
+        
+        controller.setValue(d -> {
+            d.setMinBody(minBody);
+            d.setMaxBody(maxBody);
+            d.setMinHead(minHead);
+            d.setMaxHead(maxHead);
+            d.setBodyUneven(bodyUneven);
+            d.setHeadUneven(headUneven);
+            d.setRotationDuration(rotationDuration);
+            d.setRotationDelay(rotationDelay);
+        });
+
         lastCreatedEntityTracker = controller.getTracker();
     }
 }

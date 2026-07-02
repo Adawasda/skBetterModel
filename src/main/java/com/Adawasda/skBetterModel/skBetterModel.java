@@ -2,6 +2,7 @@ package com.Adawasda.skBetterModel;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.util.Version;
+import utils.skBetterModelConfig;
 
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -44,6 +45,8 @@ public class skBetterModel extends JavaPlugin implements AddonModule {
 	@Override
 	public void onEnable() {
 		instance = this;
+		skBetterModelConfig.init(this);
+		skBetterModelConfig.get().reload();
 
 		Plugin skript = getServer().getPluginManager().getPlugin("Skript");
 

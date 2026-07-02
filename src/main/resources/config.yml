@@ -1,0 +1,9 @@
+body-rotator:
+  min-body: -180
+  max-body: 180
+  min-head: -180
+  max-head: 180
+  body-uneven: false
+  head-uneven: false
+  rotation-duration: 0
+  rotation-delay: 0

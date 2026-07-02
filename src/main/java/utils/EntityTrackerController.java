@@ -9,10 +9,13 @@ import kr.toxicity.model.api.profile.ModelProfile;
 import kr.toxicity.model.api.tracker.EntityTracker;
 import kr.toxicity.model.api.tracker.EntityTrackerRegistry;
 import kr.toxicity.model.api.tracker.ModelScaler;
+import kr.toxicity.model.api.tracker.TrackerModifier;
 import kr.toxicity.model.api.tracker.TrackerUpdateAction;
+import kr.toxicity.model.api.tracker.EntityBodyRotator.RotatorData;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
@@ -37,7 +40,20 @@ public class EntityTrackerController {
 
     public EntityTrackerController(Entity entity, String model) {
         this.tracker = BetterModel.model(model)
-                .map(r -> r.getOrCreate(BukkitAdapter.adapt(entity)))
+                .map(r -> r.getOrCreate(BukkitAdapter.adapt(entity), TrackerModifier.DEFAULT, t -> {
+                    t.bodyRotator().lockRotation(false);
+                    t.bodyRotator().setValue(data -> {
+                        data.setMinBody(-180f);
+                        data.setMaxBody(180f);
+                        data.setMinHead(-180f);
+                        data.setMaxHead(180f);
+                        data.setBodyUneven(false);
+                        data.setHeadUneven(false);
+                        data.setRotationDuration(0);
+                        data.setRotationDelay(0);                    
+                    });
+                }   
+            ))
                 .orElse(null);
     }
 
@@ -108,5 +124,9 @@ public class EntityTrackerController {
         if (tracker == null) return null;
         return tracker.renderer().animations();
     }
- 
+
+    public void setValue(Consumer<RotatorData> consumer) {
+        if (tracker == null) return;
+        tracker.bodyRotator().setValue(consumer);
+} 
 }
