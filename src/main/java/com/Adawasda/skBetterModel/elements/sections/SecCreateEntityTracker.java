@@ -214,8 +214,9 @@ public class SecCreateEntityTracker extends Section {
             d.setRotationDelay(rotationDelay);
         });
 
-        controller.setOffset(offsetExpr.getSingle(event).toVector3f());
-
+        if (offsetExpr != null && offsetExpr.getSingle(event) != null) {
+            controller.setOffset(offsetExpr.getSingle(event).toVector3f());
+        }
         lastCreatedEntityTracker = controller.getTracker();
     }
 }
