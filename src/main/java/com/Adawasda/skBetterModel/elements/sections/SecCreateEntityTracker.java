@@ -71,6 +71,7 @@ public class SecCreateEntityTracker extends Section {
             .addEntryData(new ExpressionEntryData<>("view range", null, true, Number.class))
             .addEntryData(new ExpressionEntryData<>("tint", null, true, Color.class))
             .addEntryData(new ExpressionEntryData<>("player", null, true, OfflinePlayer.class))
+            .addEntryData(new ExpressionEntryData<>("offset", null, true, Vector.class))
 
             // Body Rotator
             .addEntryData(new ExpressionEntryData<>("min body", null, true, Number.class))
