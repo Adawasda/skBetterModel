@@ -51,6 +51,8 @@ public class SecCreateEntityTracker extends Section {
     private Expression<Number> viewRangeExpr;
     private Expression<Color> tintExpr;
     private Expression<Object> playerExpr;
+    private Expression<Vector> offsetExpr;
+
     private Expression<Number> minBodyExpr;
     private Expression<Number> maxBodyExpr;
     private Expression<Number> minHeadExpr;
@@ -123,7 +125,8 @@ public class SecCreateEntityTracker extends Section {
         viewRangeExpr = (Expression<Number>) container.getOptional("view range", Expression.class, true);
         tintExpr = (Expression<Color>) container.getOptional("tint", Expression.class, true);
         playerExpr = (Expression<Object>) container.getOptional("player", Expression.class, true);
-        
+        offsetExpr = (Expression<Vector>) container.getOptional("offset", Expression.class, true);
+
         // Body Rotator
         minBodyExpr = (Expression<Number>) container.getOptional("min body", Expression.class, true);
         maxBodyExpr = (Expression<Number>) container.getOptional("max body", Expression.class, true);
@@ -210,6 +213,8 @@ public class SecCreateEntityTracker extends Section {
             d.setRotationDuration(rotationDuration);
             d.setRotationDelay(rotationDelay);
         });
+
+        controller.setOffset(offsetExpr.getSingle(event).toVector3f());
 
         lastCreatedEntityTracker = controller.getTracker();
     }

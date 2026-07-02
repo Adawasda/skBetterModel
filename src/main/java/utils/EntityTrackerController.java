@@ -11,6 +11,7 @@ import kr.toxicity.model.api.tracker.EntityTrackerRegistry;
 import kr.toxicity.model.api.tracker.ModelScaler;
 import kr.toxicity.model.api.tracker.TrackerModifier;
 import kr.toxicity.model.api.tracker.TrackerUpdateAction;
+import kr.toxicity.model.api.util.function.BonePredicate;
 import kr.toxicity.model.api.tracker.EntityBodyRotator.RotatorData;
 
 import java.util.Map;
@@ -114,12 +115,6 @@ public class EntityTrackerController {
         tracker.animate(animationName, modifier);
     }
 
-    public void setOffset(Vector3f offset) {
-        if (tracker == null) return;
-        return;
-        //!TODO
-    }
-
     public Map<String, BlueprintAnimation> getAnimations() {
         if (tracker == null) return null;
         return tracker.renderer().animations();
@@ -128,5 +123,15 @@ public class EntityTrackerController {
     public void setValue(Consumer<RotatorData> consumer) {
         if (tracker == null) return;
         tracker.bodyRotator().setValue(consumer);
-} 
+    } 
+
+    public void setOffset(Vector3f vector) {
+        if (tracker == null) return;
+        var pipeline = tracker.getPipeline();
+        pipeline.defaultPosition(vec -> vector);
+        pipeline.addPositionModifier(  
+            BonePredicate.TRUE,  
+            position -> position.add(vector.x, vector.y, vector.z)  
+        );
+    }
 }
