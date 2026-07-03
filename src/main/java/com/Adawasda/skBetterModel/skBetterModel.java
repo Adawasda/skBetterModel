@@ -12,7 +12,8 @@ import org.skriptlang.skript.addon.AddonModule;
 import org.skriptlang.skript.addon.SkriptAddon;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-import com.Adawasda.skBetterModel.elements.effects.EffPlayAnimation;
+import com.Adawasda.skBetterModel.elements.effects.EffSecPlayAnimation;
+import com.Adawasda.skBetterModel.elements.effects.EffSecPlayAnimation;
 import com.Adawasda.skBetterModel.elements.events.EvtBMReloadEnd;
 import com.Adawasda.skBetterModel.elements.events.EvtBMReloadStart;
 import com.Adawasda.skBetterModel.elements.events.EvtDummyTrackerCreate;
@@ -28,6 +29,7 @@ import com.Adawasda.skBetterModel.elements.expressions.ExprModelAnimations;
 import com.Adawasda.skBetterModel.elements.expressions.ExprLastEntityTracker;
 import com.Adawasda.skBetterModel.elements.expressions.properties.animation.ExprAnimationName;
 import com.Adawasda.skBetterModel.elements.sections.SecCreateEntityTracker;
+import com.Adawasda.skBetterModel.elements.types.TypeAnimationModifier;
 import com.Adawasda.skBetterModel.elements.types.TypeBlueprintAnimation;
 import com.Adawasda.skBetterModel.elements.types.TypeEntityTracker;
 import com.Adawasda.skBetterModel.elements.types.TypeModelRenderer;
@@ -93,6 +95,7 @@ public class skBetterModel extends JavaPlugin implements AddonModule {
 		TypeEntityTracker.register();
 		TypeModelRenderer.register();
 		TypeBlueprintAnimation.register();
+		TypeAnimationModifier.register();
 	}
 
 	@Override
@@ -112,7 +115,7 @@ public class skBetterModel extends JavaPlugin implements AddonModule {
 		// Register conditions
 
 		// Register effects
-		EffPlayAnimation.register(registry);
+		EffSecPlayAnimation.register(registry);
 
 		// Register events
 		EvtBMReloadStart.register(registry);
