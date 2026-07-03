@@ -1,4 +1,4 @@
-package utils;
+package com.Adawasda.skBetterModel.utils;
 
 import org.joml.Quaternionf;
 

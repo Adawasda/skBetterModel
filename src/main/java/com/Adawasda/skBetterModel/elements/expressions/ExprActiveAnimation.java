@@ -14,7 +14,7 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import kr.toxicity.model.api.animation.RunningAnimation;
 import kr.toxicity.model.api.tracker.EntityTracker;
-import utils.EntityTrackerController;
+import com.Adawasda.skBetterModel.utils.EntityTrackerController;
 
 @SuppressWarnings("unchecked")
 public class ExprActiveAnimation extends SimpleExpression<RunningAnimation> {

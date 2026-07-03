@@ -31,9 +31,9 @@ import kr.toxicity.model.api.platform.PlatformEntity;
 import kr.toxicity.model.api.tracker.EntityTracker;
 import kr.toxicity.model.api.tracker.ModelScaler;
 import kr.toxicity.model.api.tracker.TrackerUpdateAction;
-import utils.EntityTrackerController;
-import utils.skBetterModelConfig;
-import utils.utils;
+import com.Adawasda.skBetterModel.utils.EntityTrackerController;
+import com.Adawasda.skBetterModel.utils.skBetterModelConfig;
+import com.Adawasda.skBetterModel.utils.utils;
 
 @SuppressWarnings("unused")
 public class SecCreateEntityTracker extends Section {

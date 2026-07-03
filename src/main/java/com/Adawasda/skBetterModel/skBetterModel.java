@@ -2,7 +2,7 @@ package com.Adawasda.skBetterModel;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.util.Version;
-import utils.skBetterModelConfig;
+import com.Adawasda.skBetterModel.utils.skBetterModelConfig;
 
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;

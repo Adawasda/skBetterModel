@@ -13,7 +13,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import kr.toxicity.model.api.animation.AnimationModifier;
 import kr.toxicity.model.api.tracker.EntityTracker;
-import utils.EntityTrackerController;
+import com.Adawasda.skBetterModel.utils.EntityTrackerController;
 
 @SuppressWarnings("unchecked")
 public class EffPlayAnimation extends Effect {

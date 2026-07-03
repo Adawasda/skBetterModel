@@ -1,4 +1,4 @@
-package utils;
+package com.Adawasda.skBetterModel.utils;
 
 import kr.toxicity.model.api.BetterModel;
 import kr.toxicity.model.api.animation.AnimationModifier;
