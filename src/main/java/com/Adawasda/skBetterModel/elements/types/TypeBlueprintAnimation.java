@@ -13,8 +13,8 @@ public class TypeBlueprintAnimation {
 
     public static void register() {
         if (Classes.getExactClassInfo(BlueprintAnimation.class) == null) {
-            Classes.registerClass(new ClassInfo<>(BlueprintAnimation.class, "blueprintanimation")
-                .user("blueprint ?animations?")
+            Classes.registerClass(new ClassInfo<>(BlueprintAnimation.class, "animation")
+                .user("animations?")
                 .name("Blueprint Animation")
                 .description("Represents a blueprint animation.")
                 .parser(new Parser<BlueprintAnimation>() {

@@ -21,6 +21,7 @@ import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import kr.toxicity.model.api.animation.AnimationModifier;
+import kr.toxicity.model.api.data.blueprint.BlueprintAnimation;
 import kr.toxicity.model.api.tracker.EntityTracker;
 import com.Adawasda.skBetterModel.utils.EntityTrackerController;
 
@@ -30,14 +31,15 @@ public class EffSecPlayAnimation extends EffectSection {
     public static class AnimationModifierEvent extends Event {
 
         private final AnimationModifier modifier;
+        private final BlueprintAnimation animation;
 
-        public AnimationModifierEvent(AnimationModifier modifier) {
+        public AnimationModifierEvent(AnimationModifier modifier, BlueprintAnimation animation) {
             this.modifier = modifier;
+            this.animation = animation;
         }
 
-        public AnimationModifier getModifier() {
-            return modifier;
-        }
+        public AnimationModifier getModifier() { return modifier; }
+        public BlueprintAnimation getAnimation() { return animation; }
 
         @Override
         @NotNull
@@ -67,6 +69,7 @@ public class EffSecPlayAnimation extends EffectSection {
                 .build());
 
         EventValues.registerEventValue(AnimationModifierEvent.class, AnimationModifier.class, AnimationModifierEvent::getModifier);
+        EventValues.registerEventValue(AnimationModifierEvent.class, BlueprintAnimation.class, AnimationModifierEvent::getAnimation);
     }
 
     @Override
@@ -116,21 +119,27 @@ public class EffSecPlayAnimation extends EffectSection {
 
         if (controller.getTracker() == null) return super.walk(event, false);
 
+        String animName = animationName.getSingle(event);
+        if (animName == null) return super.walk(event, false);
+
         AnimationModifier modifier = (matchedPattern == 0 || matchedPattern == 2)
                 ? AnimationModifier.DEFAULT
                 : AnimationModifier.DEFAULT_WITH_PLAY_ONCE;
 
         if (trigger != null) {
-            AnimationModifierEvent modifierEvent = new AnimationModifierEvent(modifier);
+            BlueprintAnimation blueprintAnimation = controller.getAnimations() != null
+                    ? controller.getAnimations().get(animName)
+                    : null;
+
+            AnimationModifierEvent modifierEvent = new AnimationModifierEvent(modifier, blueprintAnimation);
             Variables.withLocalVariables(event, modifierEvent, () -> TriggerItem.walk(trigger, modifierEvent));
             modifier = modifierEvent.getModifier();
         }
 
-        controller.animate(animationName.getSingle(event), modifier, isForced);
+        controller.animate(animName, modifier, isForced);
 
         return super.walk(event, false);
     }
-
     @Override
     public String toString(@Nullable Event event, boolean debug) {
         String target = entityTrackerExpr != null
