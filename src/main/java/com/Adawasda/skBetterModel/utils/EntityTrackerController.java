@@ -28,6 +28,7 @@ public class EntityTrackerController {
 
     private final EntityTracker tracker;
     private final skBetterModel plugin = skBetterModel.getInstance();
+    private String startAnimation;
 
     public EntityTrackerController(Entity entity) {
         EntityTrackerRegistry registry = EntityTrackerRegistry.registry(entity.getUniqueId());  
@@ -134,4 +135,5 @@ public class EntityTrackerController {
             position -> position.add(vector.x, vector.y, vector.z)  
         );
     }
+
 }

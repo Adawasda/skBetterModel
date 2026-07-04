@@ -26,6 +26,8 @@ import ch.njol.skript.util.Color;
 import ch.njol.skript.lang.TriggerItem;
 import ch.njol.util.Kleenean;
 import kr.toxicity.model.api.BetterModel;
+import kr.toxicity.model.api.animation.AnimationIterator;
+import kr.toxicity.model.api.animation.AnimationModifier;
 import kr.toxicity.model.api.bukkit.platform.BukkitAdapter;
 import kr.toxicity.model.api.platform.PlatformEntity;
 import kr.toxicity.model.api.tracker.EntityTracker;
@@ -44,6 +46,7 @@ public class SecCreateEntityTracker extends Section {
 
     private Expression<Entity> entityExpr;
     private Expression<Vector> scaleExpr;
+    private Expression<String> startAnimationExpr;
 
     private Expression<Number> brightnessExpr;
     private Expression<Boolean> glowExpr;
@@ -64,6 +67,7 @@ public class SecCreateEntityTracker extends Section {
 
     private static final EntryValidator validator = EntryValidator.builder()
             .addEntryData(new ExpressionEntryData<>("entity", null, true, Entity.class))
+            .addEntryData(new ExpressionEntryData<>("start animation", null, true, String.class))
             .addEntryData(new ExpressionEntryData<>("scale", null, true, Vector.class))
             .addEntryData(new ExpressionEntryData<>("brightness", null, true, Number.class))
             .addEntryData(new ExpressionEntryData<>("glow", null, true, Boolean.class))
@@ -118,8 +122,8 @@ public class SecCreateEntityTracker extends Section {
             return false;
 
         entityExpr = (Expression<Entity>) container.getOptional("entity", Expression.class, true);
+        startAnimationExpr = (Expression<String>) container.getOptional("start animation", Expression.class, true);
         scaleExpr = (Expression<Vector>) container.getOptional("scale", Expression.class, true);
-
         brightnessExpr = (Expression<Number>) container.getOptional("brightness", Expression.class, true);
         glowExpr = (Expression<Boolean>) container.getOptional("glow", Expression.class, true);
         glowColorExpr = (Expression<Color>) container.getOptional("glow color", Expression.class, true);
@@ -152,7 +156,14 @@ public class SecCreateEntityTracker extends Section {
 
         String model = modelName.getSingle(event);
         Entity entity = entityExpr.getSingle(event);
+        if (entity == null) {
+            Skript.error("Entity cannot be null!");
+            return;
+        }
+
         skBetterModelConfig config = skBetterModelConfig.get();
+
+        String startAnimation = startAnimationExpr != null ? startAnimationExpr.getSingle(event) : null;
         
         float minBody = minBodyExpr != null ? minBodyExpr.getSingle(event).floatValue() : config.getMinBody();
         float maxBody = maxBodyExpr != null ? maxBodyExpr.getSingle(event).floatValue() : config.getMaxBody();
@@ -218,6 +229,18 @@ public class SecCreateEntityTracker extends Section {
         if (offsetExpr != null && offsetExpr.getSingle(event) != null) {
             controller.setOffset(offsetExpr.getSingle(event).toVector3f());
         }
+        if (startAnimation != null) {
+            controller.animate(startAnimation,         
+                AnimationModifier.builder()  
+                    .override(true)
+                    .start(0)  
+                    .end(0)
+                    .type(AnimationIterator.Type.PLAY_ONCE)  
+                    .build()  
+                ,true);
+        }
         lastCreatedEntityTracker = controller.getTracker();
+
+        
     }
 }
