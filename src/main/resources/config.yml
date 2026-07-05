@@ -7,3 +7,10 @@ body-rotator:
   head-uneven: false
   rotation-duration: 0
   rotation-delay: 0
+
+animation:
+  speed: 1
+  priority: 0
+  override: false
+  start: 0
+  end: 0

@@ -130,10 +130,6 @@ public class EntityTrackerController {
         if (tracker == null) return;
         var pipeline = tracker.getPipeline();
         pipeline.defaultPosition(vec -> vector);
-        pipeline.addPositionModifier(  
-            BonePredicate.TRUE,  
-            position -> position.add(vector.x, vector.y, vector.z)  
-        );
     }
 
 }

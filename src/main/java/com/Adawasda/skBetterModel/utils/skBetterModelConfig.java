@@ -19,6 +19,13 @@ public class skBetterModelConfig {
     private int rotationDuration;
     private int rotationDelay;
 
+    // Animation default values 
+    private float speed;
+    private int priority;
+    private boolean override;
+    private int start;
+    private int end;
+
 
     private skBetterModelConfig(skBetterModel plugin) {
         this.plugin = plugin;
@@ -51,6 +58,12 @@ public class skBetterModelConfig {
         headUneven = config.getBoolean("body-rotator.head-uneven", false);
         rotationDuration = config.getInt("body-rotator.rotation-duration", 0);
         rotationDelay = config.getInt("body-rotator.rotation-delay", 0);
+
+        speed = (float) config.getDouble("animation.speed", 1);
+        priority = config.getInt("animation.priority", 0);
+        override = config.getBoolean("animation.override", false);
+        start = config.getInt("animation.start", 0);
+        end = config.getInt("animation.end", 0);
     }   
 
 
@@ -62,6 +75,12 @@ public class skBetterModelConfig {
     public boolean isHeadUneven() { return headUneven; }
     public int getRotationDuration() { return rotationDuration; }
     public int getRotationDelay() { return rotationDelay; }
+
+    public float getSpeed() { return speed; }
+    public int getPriority() { return priority; }
+    public boolean isOverride() { return override; }
+    public int getStart() { return start; }
+    public int getEnd() { return end; }
 
 }
 
