@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Display.Billboard;
 import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -64,6 +65,7 @@ public class SecCreateEntityTracker extends Section {
     private Expression<Boolean> headUnevenExpr;
     private Expression<Number> rotationDurationExpr;
     private Expression<Number> rotationDelayExpr;
+    private Expression<Billboard> billboardExpr;
 
     private static final EntryValidator validator = EntryValidator.builder()
             .addEntryData(new ExpressionEntryData<>("entity", null, true, Entity.class))
@@ -76,6 +78,7 @@ public class SecCreateEntityTracker extends Section {
             .addEntryData(new ExpressionEntryData<>("tint", null, true, Color.class))
             .addEntryData(new ExpressionEntryData<>("player", null, true, OfflinePlayer.class))
             .addEntryData(new ExpressionEntryData<>("offset", null, true, Vector.class))
+            .addEntryData(new ExpressionEntryData<>("billboard", null, true, Billboard.class))
 
             // Body Rotator
             .addEntryData(new ExpressionEntryData<>("min body", null, true, Number.class))
@@ -131,6 +134,7 @@ public class SecCreateEntityTracker extends Section {
         tintExpr = (Expression<Color>) container.getOptional("tint", Expression.class, true);
         playerExpr = (Expression<Object>) container.getOptional("player", Expression.class, true);
         offsetExpr = (Expression<Vector>) container.getOptional("offset", Expression.class, true);
+        billboardExpr = (Expression<Billboard>) container.getOptional("billboard", Expression.class, true);
 
         // Body Rotator
         minBodyExpr = (Expression<Number>) container.getOptional("min body", Expression.class, true);
@@ -213,6 +217,10 @@ public class SecCreateEntityTracker extends Section {
         if (tintExpr != null && tintExpr.getSingle(event) != null) {
             Color c = tintExpr.getSingle(event);
             controller.setTint(utils.rgbToInt(c.getRed(), c.getGreen(), c.getBlue()));
+        }
+
+        if (billboardExpr != null && billboardExpr.getSingle(event) != null) {
+            controller.setBillboard(billboardExpr.getSingle(event));
         }
         
         controller.setValue(d -> {

@@ -8,10 +8,10 @@ import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import kr.toxicity.model.api.animation.AnimationModifier;
 
-public class ExprModifierEnd extends SimplePropertyExpression<AnimationModifier.Builder, Number> {
+public class ExprModifierStart extends SimplePropertyExpression<AnimationModifier.Builder, Number> {
 
     public static void register() {
-        PropertyExpression.register(ExprModifierEnd.class, Number.class, "end", "modifier");
+        PropertyExpression.register(ExprModifierStart.class, Number.class, "start", "modifier");
     }
 
     @Override
@@ -21,7 +21,7 @@ public class ExprModifierEnd extends SimplePropertyExpression<AnimationModifier.
 
     @Override
     public @Nullable Number convert(AnimationModifier.Builder from) {
-        return from.build().end();
+        return from.build().start();
     }
 
     @Override
@@ -41,12 +41,12 @@ public class ExprModifierEnd extends SimplePropertyExpression<AnimationModifier.
             case SET -> {
                 int value = delta != null ? ((Number) delta[0]).intValue() : 0;
                 for (AnimationModifier.Builder builder : builders) {
-                    builder.end(value);
+                    builder.start(value);
                 }
             }
             case RESET, DELETE -> {
                 for (AnimationModifier.Builder builder : builders) {
-                    builder.end(0);
+                    builder.start(0);
                 }
             }
             default -> {}
@@ -55,6 +55,6 @@ public class ExprModifierEnd extends SimplePropertyExpression<AnimationModifier.
 
     @Override
     protected String getPropertyName() {
-        return "end";
+        return "start";
     }
 }

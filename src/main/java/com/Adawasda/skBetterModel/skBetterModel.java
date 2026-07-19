@@ -31,8 +31,10 @@ import com.Adawasda.skBetterModel.elements.expressions.properties.animation.Expr
 import com.Adawasda.skBetterModel.elements.expressions.properties.animation.ExprAnimationName;
 import com.Adawasda.skBetterModel.elements.expressions.properties.modifier.ExprModifierEnd;
 import com.Adawasda.skBetterModel.elements.expressions.properties.modifier.ExprModifierSpeed;
+import com.Adawasda.skBetterModel.elements.expressions.properties.modifier.ExprModifierStart;
 import com.Adawasda.skBetterModel.elements.sections.SecCreateEntityTracker;
 import com.Adawasda.skBetterModel.elements.types.TypeAnimationModifier;
+import com.Adawasda.skBetterModel.elements.types.TypeAnimationModifierBuilder;
 import com.Adawasda.skBetterModel.elements.types.TypeBlueprintAnimation;
 import com.Adawasda.skBetterModel.elements.types.TypeEntityTracker;
 import com.Adawasda.skBetterModel.elements.types.TypeModelRenderer;
@@ -99,6 +101,7 @@ public class skBetterModel extends JavaPlugin implements AddonModule {
 		TypeModelRenderer.register();
 		TypeBlueprintAnimation.register();
 		TypeAnimationModifier.register();
+		TypeAnimationModifierBuilder.register();
 	}
 
 	@Override
@@ -118,6 +121,7 @@ public class skBetterModel extends JavaPlugin implements AddonModule {
 
 		ExprModifierSpeed.register();
 		ExprModifierEnd.register();
+		ExprModifierStart.register();
 
 		// Register conditions
 

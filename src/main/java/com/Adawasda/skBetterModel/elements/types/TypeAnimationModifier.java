@@ -13,8 +13,8 @@ public class TypeAnimationModifier {
 
     public static void register() {
         if (Classes.getExactClassInfo(AnimationModifier.class) == null) {
-            Classes.registerClass(new ClassInfo<>(AnimationModifier.class, "modifier")
-                .user("modifiers?")
+            Classes.registerClass(new ClassInfo<>(AnimationModifier.class, "animationmodifier")
+                .user("animation modifiers?")
                 .name("Animation Modifier")
                 .description("Represents a blueprint animation modifier.")
                 .parser(new Parser<AnimationModifier>() {

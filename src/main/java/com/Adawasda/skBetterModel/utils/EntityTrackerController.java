@@ -5,6 +5,7 @@ import kr.toxicity.model.api.animation.AnimationModifier;
 import kr.toxicity.model.api.animation.RunningAnimation;
 import kr.toxicity.model.api.bukkit.platform.BukkitAdapter;
 import kr.toxicity.model.api.data.blueprint.BlueprintAnimation;
+import kr.toxicity.model.api.platform.PlatformBillboard;
 import kr.toxicity.model.api.profile.ModelProfile;
 import kr.toxicity.model.api.tracker.EntityTracker;
 import kr.toxicity.model.api.tracker.EntityTrackerRegistry;
@@ -19,6 +20,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Display.Billboard;
 import org.bukkit.entity.Entity;
 import org.joml.Vector3f;
 
@@ -129,7 +131,20 @@ public class EntityTrackerController {
     public void setOffset(Vector3f vector) {
         if (tracker == null) return;
         var pipeline = tracker.getPipeline();
-        pipeline.defaultPosition(vec -> vector);
+        pipeline.addPositionModifier(BonePredicate.TRUE, vec -> vec.add(vector.x, vector.y, vector.z));
+        tracker.forceUpdate(true);
+    }
+
+    public void setBillboard(Billboard billboard) {
+        if (tracker == null) return;
+
+        switch (billboard) {
+            case CENTER -> tracker.update(TrackerUpdateAction.billboard(PlatformBillboard.CENTER));
+            case VERTICAL -> tracker.update(TrackerUpdateAction.billboard(PlatformBillboard.VERTICAL));
+            case HORIZONTAL -> tracker.update(TrackerUpdateAction.billboard(PlatformBillboard.HORIZONTAL));
+            case FIXED -> tracker.update(TrackerUpdateAction.billboard(PlatformBillboard.FIXED));
+        }
+
     }
 
 }

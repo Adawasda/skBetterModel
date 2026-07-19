@@ -13,7 +13,7 @@ import kr.toxicity.model.api.animation.AnimationModifier;
 public class ExprModifierSpeed extends SimplePropertyExpression<AnimationModifier.Builder, Number> {
 
     public static void register() {
-        PropertyExpression.register(ExprModifierSpeed.class, Number.class, "speed", "modifierbuilder");
+        PropertyExpression.register(ExprModifierSpeed.class, Number.class, "speed", "modifier");
     }
 
     @Override
