@@ -33,15 +33,14 @@ public final class TypeAnimationModifier {
                     @Override
                     public @NotNull String toVariableNameString(AnimationModifier modifier) {
                         return "animationmodifier_" + modifier.start() + "_" + modifier.end()
-                                + "_" + modifier.priority() + "_" + modifier.speedValue();
+                                + "_" + modifier.speedValue();
                     }
 
                     @Override
                     public @NotNull String toString(AnimationModifier modifier, int flags) {
                         return "animation modifier(speed=" + modifier.speedValue()
                                 + ", start=" + modifier.start()
-                                + ", end=" + modifier.end()
-                                + ", priority=" + modifier.priority() + ")";
+                                + ", end=" + modifier.end() + ")";
                     }
                 })
         );

@@ -42,8 +42,7 @@ public final class TypeAnimationModifierBuilder {
                         AnimationModifier built = builder.build();
                         return "modifier builder(speed=" + built.speedValue()
                                 + ", start=" + built.start()
-                                + ", end=" + built.end()
-                                + ", priority=" + built.priority() + ")";
+                                + ", end=" + built.end() + ")";
                     }
                 })
         );

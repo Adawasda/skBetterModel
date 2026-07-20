@@ -19,8 +19,8 @@ public class BoneController {
     public BoneController(@NotNull EntityTracker tracker, @NotNull RenderedBone bone) {
         this.tracker = tracker;
         this.bone = bone;
-        this.bone.addGlobalRotModifier(BonePredicate.TRUE, rotation ->
-                rotation.mul(customRotation, new Quaternionf()));
+        this.bone.addRotationModifier(BonePredicate.TRUE, rotation -> 
+            rotation.mul(customRotation, new Quaternionf()) );
     }
 
     public @NotNull RenderedBone getBone() {
