@@ -56,7 +56,16 @@ public class SkBetterModel extends JavaPlugin implements AddonModule {
             getLogger().severe("BetterModel not found or disabled. Disabling skBetterModel...");
             getServer().getPluginManager().disablePlugin(this);
             return;
+        } else {
+            String version = betterModel.getPluginMeta().getVersion();
+            if (!version.startsWith("2.")) {
+                getLogger().severe("BetterModel 2.x.x or newer is required. Disabling...");
+                getServer().getPluginManager().disablePlugin(this);
+                return;
+            } 
         }
+
+
 
         SkriptAddon addon = Skript.instance().registerAddon(SkBetterModel.class, "skBetterModel");
         addon.localizer().setSourceDirectories("lang", null);
