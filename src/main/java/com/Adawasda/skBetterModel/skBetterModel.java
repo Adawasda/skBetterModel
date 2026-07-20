@@ -44,4 +44,8 @@ public class SkBetterModel extends JavaPlugin {
         }
     }
 
+    public @NotNull String name() {
+        return "skBetterModel";
+    }
+
 }

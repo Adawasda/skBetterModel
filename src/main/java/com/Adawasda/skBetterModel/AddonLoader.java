@@ -27,6 +27,7 @@ import com.Adawasda.skBetterModel.elements.expressions.ExprBoneByName;
 import com.Adawasda.skBetterModel.elements.expressions.ExprEntityTrackerOf;
 import com.Adawasda.skBetterModel.elements.expressions.ExprLastEntityTracker;
 import com.Adawasda.skBetterModel.elements.expressions.ExprModelAnimations;
+import com.Adawasda.skBetterModel.elements.expressions.ExprPlayerLimb;
 import com.Adawasda.skBetterModel.elements.expressions.ExprTrackerBones;
 import com.Adawasda.skBetterModel.elements.expressions.properties.animation.ExprAnimationLength;
 import com.Adawasda.skBetterModel.elements.expressions.properties.animation.ExprAnimationName;
@@ -53,7 +54,6 @@ import ch.njol.skript.util.Version;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 
 
 // Not my code, i got inspired by Crebs's BetterModelSk
@@ -105,7 +105,8 @@ public class AddonLoader {
         ExprModelAnimations::register,
         ExprTrackerBones::register,
         ExprBoneByName::register,
-        ExprEntityTrackerOf::register
+        ExprEntityTrackerOf::register,
+        ExprPlayerLimb::register
     );
 
     private static final List<Runnable> EXPRESSION_PROPERTIES = List.of(

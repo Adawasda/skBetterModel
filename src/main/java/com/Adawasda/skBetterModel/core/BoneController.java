@@ -2,6 +2,7 @@ package com.Adawasda.skBetterModel.core;
 
 import kr.toxicity.model.api.bone.BoneName;
 import kr.toxicity.model.api.bone.RenderedBone;
+import kr.toxicity.model.api.player.PlayerLimb;
 import kr.toxicity.model.api.tracker.EntityTracker;
 import kr.toxicity.model.api.util.function.BonePredicate;
 
@@ -51,6 +52,11 @@ public class BoneController {
                 .rotateY((float) Math.toRadians(yaw))
                 .rotateZ((float) Math.toRadians(roll));
         tracker.forceUpdate(true);
+    }
+
+    public void setPlayerLimb(PlayerLimb playerLimb) {
+        this.bone.setItemMapper(playerLimb.getItemMapper());
+        this.bone.updateItem(bone -> true);
     }
 
     public void resetRotation() {
