@@ -23,7 +23,7 @@ import com.Adawasda.skBetterModel.elements.expressions.properties.tracker.*;
 import com.Adawasda.skBetterModel.elements.sections.*;
 import com.Adawasda.skBetterModel.elements.types.*;
 
-public class SkBetterModel extends JavaPlugin implements AddonModule {
+public class SkBetterModel extends JavaPlugin {
 
     private static @Nullable SkBetterModel instance;
 
@@ -37,97 +37,11 @@ public class SkBetterModel extends JavaPlugin implements AddonModule {
         PluginConfig.init(this);
         PluginConfig.get().reload();
 
-        Plugin skript = getServer().getPluginManager().getPlugin("Skript");
 
-        if (skript == null || !skript.isEnabled()) {
-            getLogger().severe("Skript not found or disabled. Disabling skBetterModel...");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
+        AddonLoader loader = new AddonLoader(instance);
+        if (loader.load()) {
+            loader.getComponentLogger().info("skBetterModel loaded successfully.");
         }
-
-        if (Skript.getVersion().isSmallerThan(new Version("2.14.3"))) {
-            getLogger().severe("Skript 2.14.3 or newer is required. Disabling...");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-
-        Plugin betterModel = getServer().getPluginManager().getPlugin("BetterModel");
-        if (betterModel == null || !betterModel.isEnabled()) {
-            getLogger().severe("BetterModel not found or disabled. Disabling skBetterModel...");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        } else {
-            String version = betterModel.getPluginMeta().getVersion();
-            if (!version.startsWith("2.")) {
-                getLogger().severe("BetterModel 2.x.x or newer is required. Disabling...");
-                getServer().getPluginManager().disablePlugin(this);
-                return;
-            } 
-        }
-
-
-
-        SkriptAddon addon = Skript.instance().registerAddon(SkBetterModel.class, "skBetterModel");
-        addon.localizer().setSourceDirectories("lang", null);
-        addon.loadModules(this);
     }
 
-    @Override
-    public @NotNull String name() {
-        return "skBetterModel";
-    }
-
-    @Override
-    public void init(@NotNull SkriptAddon addon) {
-        TypeRunningAnimation.register();
-        TypeEntityTracker.register();
-        TypeModelRenderer.register();
-        TypeBlueprintAnimation.register();
-        TypeAnimationModifier.register();
-        TypeAnimationModifierBuilder.register();
-        TypeRenderedBone.register();
-    }
-
-    @Override
-    public void load(@NotNull SkriptAddon addon) {
-        SyntaxRegistry registry = addon.syntaxRegistry();
-
-        ExprLastEntityTracker.register(registry);
-        ExprAllEntityTrackers.register(registry);
-        ExprAllModelRenderers.register(registry);
-        ExprActiveAnimation.register(registry);
-        ExprModelAnimations.register(registry);
-        ExprTrackerBones.register(registry);
-        ExprBoneByName.register(registry);
-        ExprEntityTrackerOf.register(registry);
-
-        ExprAnimationName.register();
-        ExprAnimationLength.register();
-        ExprModifierSpeed.register();
-        ExprModifierEnd.register();
-        ExprModifierStart.register();
-        ExprBoneName.register();
-        ExprBoneEnchanted.register();
-        ExprBoneScale.register();
-        ExprTrackerScale.register();
-        ExprTrackerGlow.register();
-        ExprTrackerViewRange.register();
-
-        EffSecPlayAnimation.register(registry);
-        EffStopAnimation.register(registry);
-        EffSpawnTracker.register(registry);
-        EffDespawnTracker.register(registry);
-        EffDisguise.register(registry);
-
-        EvtBMReloadStart.register(registry);
-        EvtBMReloadEnd.register(registry);
-        EvtDummyTrackerCreate.register(registry);
-        EvtEntityTrackerCreate.register(registry);
-        EvtEntityTrackerHide.register(registry);
-        EvtEntityTrackerShow.register(registry);
-        EvtModelSpawnAtPlayer.register(registry);
-        EvtModelDespawnAtPlayer.register(registry);
-
-        SecCreateEntityTracker.register(registry);
-    }
 }
