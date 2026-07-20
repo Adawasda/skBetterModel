@@ -20,14 +20,15 @@ import ch.njol.skript.lang.util.SectionUtils;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
+
 import kr.toxicity.model.api.animation.AnimationIterator;
 import kr.toxicity.model.api.animation.AnimationModifier;
 import kr.toxicity.model.api.data.blueprint.BlueprintAnimation;
 import kr.toxicity.model.api.tracker.EntityTracker;
-import com.Adawasda.skBetterModel.utils.EntityTrackerController;
-import com.Adawasda.skBetterModel.utils.skBetterModelConfig;
 
-@SuppressWarnings("unchecked")
+import com.Adawasda.skBetterModel.core.TrackerController;
+import com.Adawasda.skBetterModel.utils.PluginConfig;
+
 public class EffSecPlayAnimation extends EffectSection {
 
     public static class AnimationModifierEvent extends Event {
@@ -35,8 +36,8 @@ public class EffSecPlayAnimation extends EffectSection {
         private final AnimationModifier.Builder modifierBuilder;
         private final BlueprintAnimation animation;
 
-        public AnimationModifierEvent(AnimationModifier.Builder modifierBuilder, BlueprintAnimation animation) {
-            this.modifierBuilder = modifierBuilder;
+        public AnimationModifierEvent(AnimationModifier.Builder builder, BlueprintAnimation animation) {
+            this.modifierBuilder = builder;
             this.animation = animation;
         }
 
@@ -51,11 +52,10 @@ public class EffSecPlayAnimation extends EffectSection {
         }
     }
 
-    private Expression<String> animationName;
-    private Expression<Object> entityTrackerExpr;
-    private Expression<Entity> entityExpr;
-    private Expression<Boolean> isForcedExpr;
-    private int matchedPattern;
+    private Expression<String> animationNameExpr;
+    private Expression<Object> targetExpr;
+    private Expression<Boolean> forcedExpr;
+    private boolean playOnce;
 
     @Nullable
     private Trigger trigger;
@@ -64,34 +64,29 @@ public class EffSecPlayAnimation extends EffectSection {
         registry.register(SyntaxRegistry.SECTION, SyntaxInfo.builder(EffSecPlayAnimation.class)
                 .supplier(EffSecPlayAnimation::new)
                 .addPatterns(
-                    "play [the] [bm|bettermodel] animation %string% [for|to] %object% [with force %-boolean%]",
-                    "play [the] [bm|bettermodel] animation %string% [for|to] %object% with play once [with force %-boolean%]",
-                    "play [the] [bm|bettermodel] animation %string% [for|to] %entity% [with force %-boolean%]",
-                    "play [the] [bm|bettermodel] animation %string% [for|to] %entity% with play once [with force %-boolean%]"
+                        "play [the] [bm|bettermodel] animation %string% (for|to) %object% [with force %-boolean%]",
+                        "play [the] [bm|bettermodel] animation %string% (for|to) %object% with play once [with force %-boolean%]"
                 )
                 .build());
 
-        EventValues.registerEventValue(AnimationModifierEvent.class, AnimationModifier.Builder.class, AnimationModifierEvent::getModifierBuilder);
-        EventValues.registerEventValue(AnimationModifierEvent.class, BlueprintAnimation.class, AnimationModifierEvent::getAnimation);
+        EventValues.registerEventValue(AnimationModifierEvent.class, AnimationModifier.Builder.class,
+                AnimationModifierEvent::getModifierBuilder);
+        EventValues.registerEventValue(AnimationModifierEvent.class, BlueprintAnimation.class,
+                AnimationModifierEvent::getAnimation);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, ParseResult parseResult,
                         @Nullable SectionNode sectionNode, @Nullable List<TriggerItem> triggerItems) {
-        this.matchedPattern = matchedPattern;
-        this.animationName = (Expression<String>) expressions[0];
-
-        if (matchedPattern == 0 || matchedPattern == 1) {
-            this.entityTrackerExpr = (Expression<Object>) expressions[1];
-        } else {
-            this.entityExpr = (Expression<Entity>) expressions[1];
-        }
-
-        this.isForcedExpr = (Expression<Boolean>) expressions[2];
+        this.playOnce = (matchedPattern == 1);
+        this.animationNameExpr = (Expression<String>) expressions[0];
+        this.targetExpr = (Expression<Object>) expressions[1];
+        this.forcedExpr = (Expression<Boolean>) expressions[2];
 
         if (sectionNode != null) {
-            trigger = SectionUtils.loadLinkedCode("play animation", (beforeLoading, afterLoading)
-                    -> loadCode(sectionNode, "play animation", beforeLoading, afterLoading, AnimationModifierEvent.class));
+            trigger = SectionUtils.loadLinkedCode("play animation", (beforeLoading, afterLoading) ->
+                    loadCode(sectionNode, "play animation", beforeLoading, afterLoading, AnimationModifierEvent.class));
             return trigger != null;
         }
 
@@ -100,64 +95,50 @@ public class EffSecPlayAnimation extends EffectSection {
 
     @Override
     protected @Nullable TriggerItem walk(Event event) {
-        boolean isForced = isForcedExpr != null && isForcedExpr.getSingle(event) != null
-                ? isForcedExpr.getSingle(event)
-                : false;
+        boolean isForced = (forcedExpr != null && Boolean.TRUE.equals(forcedExpr.getSingle(event)));
 
-        EntityTrackerController controller;
+        TrackerController controller = resolveController(event);
+        if (controller == null || !controller.isValid()) return super.walk(event, false);
 
-        if (matchedPattern == 0 || matchedPattern == 1) {
-            Object obj = entityTrackerExpr.getSingle(event);
-            if (obj instanceof EntityTracker tracker) {
-                controller = new EntityTrackerController(tracker);
-            } else if (obj instanceof Entity entity) {
-                controller = new EntityTrackerController(entity);
-            } else {
-                return super.walk(event, false);
-            }
-        } else {
-            Entity entity = entityExpr.getSingle(event);
-            if (entity == null) return super.walk(event, false);
-            controller = new EntityTrackerController(entity);
-        }
-
-        if (controller.getTracker() == null) return super.walk(event, false);
-
-        String animName = animationName.getSingle(event);
+        String animName = animationNameExpr.getSingle(event);
         if (animName == null) return super.walk(event, false);
 
-        skBetterModelConfig config = skBetterModelConfig.get();
-
+        PluginConfig config = PluginConfig.get();
         AnimationModifier.Builder builder = AnimationModifier.builder()
                 .start(config.getStart())
                 .end(config.getEnd())
-                .priority(config.getPriority())
                 .speed(config.getSpeed())
                 .override(config.isOverride());
 
-        if (matchedPattern == 1 || matchedPattern == 3) {
+        if (playOnce) {
             builder.type(AnimationIterator.Type.PLAY_ONCE);
         }
 
         if (trigger != null) {
-            BlueprintAnimation blueprintAnimation = controller.getAnimations() != null
-                    ? controller.getAnimations().get(animName)
-                    : null;
-
-            AnimationModifierEvent modifierEvent = new AnimationModifierEvent(builder, blueprintAnimation);
-            Variables.withLocalVariables(event, modifierEvent, () -> TriggerItem.walk(trigger, modifierEvent));
+            BlueprintAnimation blueprint = controller.getAnimations() != null
+                    ? controller.getAnimations().get(animName) : null;
+            AnimationModifierEvent modEvent = new AnimationModifierEvent(builder, blueprint);
+            Variables.withLocalVariables(event, modEvent, () -> TriggerItem.walk(trigger, modEvent));
         }
 
         controller.animate(animName, builder.build(), isForced);
-
         return super.walk(event, false);
+    }
+
+    private @Nullable TrackerController resolveController(Event event) {
+        Object target = targetExpr.getSingle(event);
+        if (target == null) return null;
+
+        if (target instanceof EntityTracker tracker)
+            return TrackerController.wrap(tracker);
+        if (target instanceof Entity entity)
+            return TrackerController.fromExisting(entity);
+        return null;
     }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        String target = entityTrackerExpr != null
-                ? entityTrackerExpr.toString(event, debug)
-                : entityExpr.toString(event, debug);
-        return "play animation " + animationName.toString(event, debug) + " to " + target;
+        return "play animation " + animationNameExpr.toString(event, debug)
+                + " to " + targetExpr.toString(event, debug);
     }
 }

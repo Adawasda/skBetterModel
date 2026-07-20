@@ -9,15 +9,17 @@ import kr.toxicity.model.api.animation.AnimationModifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class TypeAnimationModifierBuilder {
+public final class TypeAnimationModifierBuilder {
+
+    private TypeAnimationModifierBuilder() {}
 
     public static void register() {
-        if (Classes.getExactClassInfo(AnimationModifier.Builder.class) == null) {
-            Classes.registerClass(new ClassInfo<>(AnimationModifier.Builder.class, "modifier")
+        if (Classes.getExactClassInfo(AnimationModifier.Builder.class) != null) return;
+        Classes.registerClass(new ClassInfo<>(AnimationModifier.Builder.class, "modifier")
                 .user("modifiers?")
                 .name("Animation Modifier Builder")
-                .description("Represents a mutable animation modifier.")
-                .parser(new Parser<AnimationModifier.Builder>() {
+                .description("Represents a mutable animation modifier builder for configuring playback.")
+                .parser(new Parser<>() {
                     @Override
                     public @Nullable AnimationModifier.Builder parse(@NotNull String s, @NotNull ParseContext context) {
                         return null;
@@ -29,20 +31,21 @@ public class TypeAnimationModifierBuilder {
                     }
 
                     @Override
-                    public @NotNull String toVariableNameString(AnimationModifier.Builder o) {
-                        return "modifierbuilder_" + System.identityHashCode(o);
+                    public @NotNull String toVariableNameString(AnimationModifier.Builder builder) {
+                        AnimationModifier built = builder.build();
+                        return "modifier_" + built.start() + "_" + built.end()
+                                + "_" + built.speedValue();
                     }
 
                     @Override
-                    public @NotNull String toString(AnimationModifier.Builder o, int flags) {
-                        AnimationModifier built = o.build();
-                        return "modifier (start=" + built.start() +
-                            ", end=" + built.end() +
-                            ", priority=" + built.priority() +
-                            ", speed=" + built.speedValue() + ")";
+                    public @NotNull String toString(AnimationModifier.Builder builder, int flags) {
+                        AnimationModifier built = builder.build();
+                        return "modifier builder(speed=" + built.speedValue()
+                                + ", start=" + built.start()
+                                + ", end=" + built.end()
+                                + ", priority=" + built.priority() + ")";
                     }
                 })
-            );
-        }
+        );
     }
 }

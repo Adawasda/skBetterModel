@@ -14,13 +14,14 @@ import kr.toxicity.model.api.event.ModelSpawnAtPlayerEvent;
 
 public class EvtModelSpawnAtPlayer extends SkriptEvent {
 
-	public static void register(@NotNull SyntaxRegistry registry) {
-		registry.register(BukkitSyntaxInfos.Event.KEY, BukkitSyntaxInfos.Event.builder(EvtModelSpawnAtPlayer.class, "bettermodel model spawn at player event")
-				.supplier(EvtModelSpawnAtPlayer::new)
-				.addEvent(BetterModelBukkitEvent.class)
-				.addPatterns("[bm|bettermodel] model spawn[ing] [at player]")
-				.build());
-	}
+    public static void register(@NotNull SyntaxRegistry registry) {
+        registry.register(BukkitSyntaxInfos.Event.KEY,
+                BukkitSyntaxInfos.Event.builder(EvtModelSpawnAtPlayer.class, "bettermodel model spawn at player event")
+                        .supplier(EvtModelSpawnAtPlayer::new)
+                        .addEvent(BetterModelBukkitEvent.class)
+                        .addPatterns("[bm|bettermodel] model spawn[ing] [at player]")
+                        .build());
+    }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
@@ -34,8 +35,7 @@ public class EvtModelSpawnAtPlayer extends SkriptEvent {
 
     @Override
     public boolean check(Event event) {
-        BetterModelBukkitEvent e = (BetterModelBukkitEvent) event;
-        return e.is(ModelSpawnAtPlayerEvent.class);
+        return (event instanceof BetterModelBukkitEvent bmEvent)
+                && bmEvent.is(ModelSpawnAtPlayerEvent.class);
     }
-    
 }

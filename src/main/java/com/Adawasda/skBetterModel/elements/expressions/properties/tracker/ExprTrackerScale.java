@@ -1,17 +1,19 @@
-package com.Adawasda.skBetterModel.elements.expressions.properties.modifier;
+package com.Adawasda.skBetterModel.elements.expressions.properties.tracker;
 
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
+import com.Adawasda.skBetterModel.core.TrackerController;
+
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import kr.toxicity.model.api.animation.AnimationModifier;
+import kr.toxicity.model.api.tracker.EntityTracker;
 
-public class ExprModifierSpeed extends SimplePropertyExpression<AnimationModifier.Builder, Number> {
+public class ExprTrackerScale extends SimplePropertyExpression<EntityTracker, Number> {
 
     public static void register() {
-        PropertyExpression.register(ExprModifierSpeed.class, Number.class, "speed", "modifier");
+        PropertyExpression.register(ExprTrackerScale.class, Number.class, "[bm] scale", "entitytracker");
     }
 
     @Override
@@ -20,29 +22,30 @@ public class ExprModifierSpeed extends SimplePropertyExpression<AnimationModifie
     }
 
     @Override
-    public @Nullable Number convert(AnimationModifier.Builder builder) {
-        return builder.build().speedValue();
+    public @Nullable Number convert(EntityTracker tracker) {
+        return tracker.scaler() != null ? 1.0f : 1.0f;
     }
 
     @Override
     public @Nullable Class<?>[] acceptChange(ChangeMode mode) {
         return switch (mode) {
-            case SET, RESET, DELETE -> new Class[]{Number.class};
+            case SET, RESET -> new Class[]{Number.class};
             default -> null;
         };
     }
 
     @Override
     public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-        for (AnimationModifier.Builder builder : getExpr().getArray(event)) {
+        for (EntityTracker tracker : getExpr().getArray(event)) {
+            TrackerController controller = TrackerController.wrap(tracker);
             float value = (mode == ChangeMode.SET && delta != null)
                     ? ((Number) delta[0]).floatValue() : 1f;
-            builder.speed(value);
+            controller.setScale(value);
         }
     }
 
     @Override
     protected String getPropertyName() {
-        return "speed";
+        return "scale";
     }
 }

@@ -20,8 +20,8 @@ public class ExprModifierEnd extends SimplePropertyExpression<AnimationModifier.
     }
 
     @Override
-    public @Nullable Number convert(AnimationModifier.Builder from) {
-        return from.build().end();
+    public @Nullable Number convert(AnimationModifier.Builder builder) {
+        return builder.build().end();
     }
 
     @Override
@@ -34,22 +34,10 @@ public class ExprModifierEnd extends SimplePropertyExpression<AnimationModifier.
 
     @Override
     public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-        AnimationModifier.Builder[] builders = getExpr().getArray(event);
-        if (builders.length == 0) return;
-
-        switch (mode) {
-            case SET -> {
-                int value = delta != null ? ((Number) delta[0]).intValue() : 0;
-                for (AnimationModifier.Builder builder : builders) {
-                    builder.end(value);
-                }
-            }
-            case RESET, DELETE -> {
-                for (AnimationModifier.Builder builder : builders) {
-                    builder.end(0);
-                }
-            }
-            default -> {}
+        for (AnimationModifier.Builder builder : getExpr().getArray(event)) {
+            int value = (mode == ChangeMode.SET && delta != null)
+                    ? ((Number) delta[0]).intValue() : 0;
+            builder.end(value);
         }
     }
 

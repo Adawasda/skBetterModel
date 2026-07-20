@@ -16,12 +16,15 @@ import kr.toxicity.model.api.tracker.EntityTracker;
 import kr.toxicity.model.api.tracker.EntityTrackerRegistry;
 
 public class ExprAllEntityTrackers extends SimpleExpression<EntityTracker> {
-	public static void register(@NotNull SyntaxRegistry registry) {
-		registry.register(SyntaxRegistry.EXPRESSION, DefaultSyntaxInfos.Expression.builder(ExprAllEntityTrackers.class, EntityTracker.class)
-				.supplier(ExprAllEntityTrackers::new)
-				.addPatterns("all [bm|bettermodel] entity trackers")
-				.build());
-	}
+
+    public static void register(@NotNull SyntaxRegistry registry) {
+        registry.register(SyntaxRegistry.EXPRESSION,
+                DefaultSyntaxInfos.Expression.builder(ExprAllEntityTrackers.class, EntityTracker.class)
+                        .supplier(ExprAllEntityTrackers::new)
+                        .addPatterns("all [bm|bettermodel] entity trackers")
+                        .build());
+    }
+
     @Override
     public boolean isSingle() {
         return false;
@@ -44,12 +47,9 @@ public class ExprAllEntityTrackers extends SimpleExpression<EntityTracker> {
 
     @Override
     protected EntityTracker[] get(Event event) {
-
-        List<EntityTracker> allTrackers = EntityTrackerRegistry.registries().stream()
+        List<EntityTracker> trackers = EntityTrackerRegistry.registries().stream()
                 .flatMap(registry -> registry.trackers().stream())
                 .toList();
-
-        return allTrackers.toArray(new EntityTracker[0]);
+        return trackers.toArray(new EntityTracker[0]);
     }
-    
 }

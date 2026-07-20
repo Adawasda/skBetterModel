@@ -13,21 +13,20 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
-import kr.toxicity.model.api.data.blueprint.BlueprintAnimation;
-import kr.toxicity.model.api.data.renderer.ModelRenderer;
+import kr.toxicity.model.api.bone.RenderedBone;
 import kr.toxicity.model.api.tracker.EntityTracker;
 
-import java.util.Map;
+import java.util.Collection;
 
-public class ExprModelAnimations extends SimpleExpression<BlueprintAnimation> {
+public class ExprTrackerBones extends SimpleExpression<RenderedBone> {
 
     private Expression<Object> targetExpr;
 
     public static void register(@NotNull SyntaxRegistry registry) {
         registry.register(SyntaxRegistry.EXPRESSION,
-                DefaultSyntaxInfos.Expression.builder(ExprModelAnimations.class, BlueprintAnimation.class)
-                        .supplier(ExprModelAnimations::new)
-                        .addPatterns("[all] animations of %object%")
+                DefaultSyntaxInfos.Expression.builder(ExprTrackerBones.class, RenderedBone.class)
+                        .supplier(ExprTrackerBones::new)
+                        .addPatterns("[all] bones of %object%")
                         .build());
     }
 
@@ -39,24 +38,21 @@ public class ExprModelAnimations extends SimpleExpression<BlueprintAnimation> {
     }
 
     @Override
-    protected BlueprintAnimation @Nullable [] get(Event event) {
+    protected RenderedBone @Nullable [] get(Event event) {
         Object target = targetExpr.getSingle(event);
         if (target == null) return null;
 
-        Map<String, BlueprintAnimation> animations;
-
-        if (target instanceof ModelRenderer renderer) {
-            animations = renderer.animations();
-        } else if (target instanceof EntityTracker tracker) {
-            animations = tracker.renderer().animations();
+        TrackerController controller;
+        if (target instanceof EntityTracker tracker) {
+            controller = TrackerController.wrap(tracker);
         } else if (target instanceof Entity entity) {
-            TrackerController controller = TrackerController.fromExisting(entity);
-            animations = controller.getAnimations();
+            controller = TrackerController.fromExisting(entity);
         } else {
             return null;
         }
 
-        return animations != null ? animations.values().toArray(new BlueprintAnimation[0]) : null;
+        Collection<RenderedBone> bones = controller.getBones();
+        return bones != null ? bones.toArray(new RenderedBone[0]) : null;
     }
 
     @Override
@@ -65,12 +61,12 @@ public class ExprModelAnimations extends SimpleExpression<BlueprintAnimation> {
     }
 
     @Override
-    public Class<? extends BlueprintAnimation> getReturnType() {
-        return BlueprintAnimation.class;
+    public Class<? extends RenderedBone> getReturnType() {
+        return RenderedBone.class;
     }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "animations of " + targetExpr.toString(event, debug);
+        return "bones of " + targetExpr.toString(event, debug);
     }
 }

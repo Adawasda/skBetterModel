@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.registration.BukkitSyntaxInfos;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-import ch.njol.skript.events.EvtEntity;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -15,13 +14,15 @@ import kr.toxicity.model.api.event.CreateEntityTrackerEvent;
 
 public class EvtEntityTrackerCreate extends SkriptEvent {
 
-	public static void register(@NotNull SyntaxRegistry registry) {
-		registry.register(BukkitSyntaxInfos.Event.KEY, BukkitSyntaxInfos.Event.builder(EvtEntityTrackerCreate.class, "bettermodel entity tracker create")
-				.supplier(EvtEntityTrackerCreate::new)
-				.addEvent(BetterModelBukkitEvent.class)
-				.addPatterns("[bm|bettermodel] [entity] tracker (create|spawn)")
-				.build());
-	}
+    public static void register(@NotNull SyntaxRegistry registry) {
+        registry.register(BukkitSyntaxInfos.Event.KEY,
+                BukkitSyntaxInfos.Event.builder(EvtEntityTrackerCreate.class, "bettermodel entity tracker create")
+                        .supplier(EvtEntityTrackerCreate::new)
+                        .addEvent(BetterModelBukkitEvent.class)
+                        .addPatterns("[bm|bettermodel] [entity] tracker (create|spawn)")
+                        .build());
+    }
+
     @Override
     public String toString(@Nullable Event event, boolean debug) {
         return "bettermodel entity tracker create";
@@ -34,8 +35,7 @@ public class EvtEntityTrackerCreate extends SkriptEvent {
 
     @Override
     public boolean check(Event event) {
-        BetterModelBukkitEvent e = (BetterModelBukkitEvent) event;
-        return e.is(CreateEntityTrackerEvent.class);
+        return (event instanceof BetterModelBukkitEvent bmEvent)
+                && bmEvent.is(CreateEntityTrackerEvent.class);
     }
-    
 }

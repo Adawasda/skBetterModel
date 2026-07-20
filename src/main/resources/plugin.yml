@@ -1,11 +1,7 @@
-main: com.Adawasda.skBetterModel.skBetterModel
+main: com.Adawasda.skBetterModel.SkBetterModel
 api-version: 1.21
 name: skBetterModel
 authors: ['Adawasda']
-description: A Skript addon
-version: 1.0.1
-website: https://no-website.net
-# softdepend = optional dependency (won't crash if missing, but loads after these plugins)
-# depend = required dependency (server won't start without it)
-# Skript should be softdepend because we handle the missing check ourselves in onEnable()
+description: Skript addon for BetterModel integration
+version: '@version@'
 softdepend: [Skript, BetterModel]

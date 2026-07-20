@@ -2,7 +2,6 @@ package com.Adawasda.skBetterModel;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.util.Version;
-import com.Adawasda.skBetterModel.utils.skBetterModelConfig;
 
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -12,137 +11,114 @@ import org.skriptlang.skript.addon.AddonModule;
 import org.skriptlang.skript.addon.SkriptAddon;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-import com.Adawasda.skBetterModel.elements.effects.EffSecPlayAnimation;
-import com.Adawasda.skBetterModel.elements.effects.EffSecPlayAnimation;
-import com.Adawasda.skBetterModel.elements.events.EvtBMReloadEnd;
-import com.Adawasda.skBetterModel.elements.events.EvtBMReloadStart;
-import com.Adawasda.skBetterModel.elements.events.EvtDummyTrackerCreate;
-import com.Adawasda.skBetterModel.elements.events.EvtEntityTrackerCreate;
-import com.Adawasda.skBetterModel.elements.events.EvtEntityTrackerHide;
-import com.Adawasda.skBetterModel.elements.events.EvtEntityTrackerShow;
-import com.Adawasda.skBetterModel.elements.events.EvtModelDespawnAtPlayer;
-import com.Adawasda.skBetterModel.elements.events.EvtModelSpawnAtPlayer;
-import com.Adawasda.skBetterModel.elements.expressions.ExprActiveAnimation;
-import com.Adawasda.skBetterModel.elements.expressions.ExprAllEntityTrackers;
-import com.Adawasda.skBetterModel.elements.expressions.ExprAllModelRenderers;
-import com.Adawasda.skBetterModel.elements.expressions.ExprModelAnimations;
-import com.Adawasda.skBetterModel.elements.expressions.ExprLastEntityTracker;
-import com.Adawasda.skBetterModel.elements.expressions.properties.animation.ExprAnimationLength;
-import com.Adawasda.skBetterModel.elements.expressions.properties.animation.ExprAnimationName;
-import com.Adawasda.skBetterModel.elements.expressions.properties.modifier.ExprModifierEnd;
-import com.Adawasda.skBetterModel.elements.expressions.properties.modifier.ExprModifierSpeed;
-import com.Adawasda.skBetterModel.elements.expressions.properties.modifier.ExprModifierStart;
-import com.Adawasda.skBetterModel.elements.sections.SecCreateEntityTracker;
-import com.Adawasda.skBetterModel.elements.types.TypeAnimationModifier;
-import com.Adawasda.skBetterModel.elements.types.TypeAnimationModifierBuilder;
-import com.Adawasda.skBetterModel.elements.types.TypeBlueprintAnimation;
-import com.Adawasda.skBetterModel.elements.types.TypeEntityTracker;
-import com.Adawasda.skBetterModel.elements.types.TypeModelRenderer;
-import com.Adawasda.skBetterModel.elements.types.TypeRunningAnimation;
+import com.Adawasda.skBetterModel.utils.PluginConfig;
 
-@SuppressWarnings("unused")
-public class skBetterModel extends JavaPlugin implements AddonModule {
+import com.Adawasda.skBetterModel.elements.effects.*;
+import com.Adawasda.skBetterModel.elements.events.*;
+import com.Adawasda.skBetterModel.elements.expressions.*;
+import com.Adawasda.skBetterModel.elements.expressions.properties.animation.*;
+import com.Adawasda.skBetterModel.elements.expressions.properties.bone.*;
+import com.Adawasda.skBetterModel.elements.expressions.properties.modifier.*;
+import com.Adawasda.skBetterModel.elements.expressions.properties.tracker.*;
+import com.Adawasda.skBetterModel.elements.sections.*;
+import com.Adawasda.skBetterModel.elements.types.*;
 
-	private static @Nullable skBetterModel instance;
+public class SkBetterModel extends JavaPlugin implements AddonModule {
 
-	public static @Nullable skBetterModel getInstance() {
-		return instance;
-	}
+    private static @Nullable SkBetterModel instance;
 
-	@Override
-	public void onEnable() {
-		instance = this;
-		skBetterModelConfig.init(this);
-		skBetterModelConfig.get().reload();
+    public static @Nullable SkBetterModel getInstance() {
+        return instance;
+    }
 
-		Plugin skript = getServer().getPluginManager().getPlugin("Skript");
+    @Override
+    public void onEnable() {
+        instance = this;
+        PluginConfig.init(this);
+        PluginConfig.get().reload();
 
-		if (skript == null || !skript.isEnabled()) {
-			getLogger().severe("Using Skript addon with no skript? Disabling...");
-			getServer().getPluginManager().disablePlugin(this);
-			return;
-		} else if (Skript.getVersion().isSmallerThan(new Version("2.14.3"))) {
-			getLogger().severe("Your Skript version is too old, update to 2.14.3 or newer. Disabling...");
-			getServer().getPluginManager().disablePlugin(this);
-			return;
-		}
+        Plugin skript = getServer().getPluginManager().getPlugin("Skript");
 
-		if (!isBetterModelEnabled()) {
-			getServer().getPluginManager().disablePlugin(this);
-			return;
-		}
+        if (skript == null || !skript.isEnabled()) {
+            getLogger().severe("Skript not found or disabled. Disabling skBetterModel...");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
-		SkriptAddon addon = Skript.instance().registerAddon(skBetterModel.class, "skBetterModel");
-		addon.localizer().setSourceDirectories("lang", null);
-		addon.loadModules(this);
-	}
+        if (Skript.getVersion().isSmallerThan(new Version("2.14.3"))) {
+            getLogger().severe("Skript 2.14.3 or newer is required. Disabling...");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
-	@Override
-	public @NotNull String name() {
-		return "skBetterModel";
-	}
+        Plugin betterModel = getServer().getPluginManager().getPlugin("BetterModel");
+        if (betterModel == null || !betterModel.isEnabled()) {
+            getLogger().severe("BetterModel not found or disabled. Disabling skBetterModel...");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
-	private boolean isBetterModelEnabled() {
-		Plugin plugin = getServer().getPluginManager().getPlugin("BetterModel");
-		
-		if (plugin == null) {
-			instance.getLogger().warning("BetterModel not found. Disabling...");
-			return false;
-		}
+        SkriptAddon addon = Skript.instance().registerAddon(SkBetterModel.class, "skBetterModel");
+        addon.localizer().setSourceDirectories("lang", null);
+        addon.loadModules(this);
+    }
 
-		return true;
-	
-	}
+    @Override
+    public @NotNull String name() {
+        return "skBetterModel";
+    }
 
-	@Override
-	public void init(@NotNull SkriptAddon addon) {
-		TypeRunningAnimation.register();
-		TypeEntityTracker.register();
-		TypeModelRenderer.register();
-		TypeBlueprintAnimation.register();
-		TypeAnimationModifier.register();
-		TypeAnimationModifierBuilder.register();
-	}
+    @Override
+    public void init(@NotNull SkriptAddon addon) {
+        TypeRunningAnimation.register();
+        TypeEntityTracker.register();
+        TypeModelRenderer.register();
+        TypeBlueprintAnimation.register();
+        TypeAnimationModifier.register();
+        TypeAnimationModifierBuilder.register();
+        TypeRenderedBone.register();
+    }
 
-	@Override
-	public void load(@NotNull SkriptAddon addon) {
-		SyntaxRegistry registry = addon.syntaxRegistry();
+    @Override
+    public void load(@NotNull SkriptAddon addon) {
+        SyntaxRegistry registry = addon.syntaxRegistry();
 
-		// Register expressions
-		ExprLastEntityTracker.register(registry);
-		ExprAllEntityTrackers.register(registry);
-		ExprModelAnimations.register(registry);
-		ExprActiveAnimation.register(registry);
-		ExprAllModelRenderers.register(registry);
+        ExprLastEntityTracker.register(registry);
+        ExprAllEntityTrackers.register(registry);
+        ExprAllModelRenderers.register(registry);
+        ExprActiveAnimation.register(registry);
+        ExprModelAnimations.register(registry);
+        ExprTrackerBones.register(registry);
+        ExprBoneByName.register(registry);
+        ExprEntityTrackerOf.register(registry);
 
-		// Properties
-		ExprAnimationName.register();
-		ExprAnimationLength.register();
+        ExprAnimationName.register();
+        ExprAnimationLength.register();
+        ExprModifierSpeed.register();
+        ExprModifierEnd.register();
+        ExprModifierStart.register();
+        ExprBoneName.register();
+        ExprBoneEnchanted.register();
+        ExprBoneScale.register();
+        ExprTrackerScale.register();
+        ExprTrackerGlow.register();
+        ExprTrackerViewRange.register();
 
-		ExprModifierSpeed.register();
-		ExprModifierEnd.register();
-		ExprModifierStart.register();
+        EffSecPlayAnimation.register(registry);
+        EffStopAnimation.register(registry);
+        EffSpawnTracker.register(registry);
+        EffDespawnTracker.register(registry);
+        EffDisguise.register(registry);
 
-		// Register conditions
+        EvtBMReloadStart.register(registry);
+        EvtBMReloadEnd.register(registry);
+        EvtDummyTrackerCreate.register(registry);
+        EvtEntityTrackerCreate.register(registry);
+        EvtEntityTrackerHide.register(registry);
+        EvtEntityTrackerShow.register(registry);
+        EvtModelSpawnAtPlayer.register(registry);
+        EvtModelDespawnAtPlayer.register(registry);
 
-		// Register effects
-		EffSecPlayAnimation.register(registry);
-
-		// Register events
-		EvtBMReloadStart.register(registry);
-		EvtBMReloadEnd.register(registry);
-		EvtDummyTrackerCreate.register(registry);
-		EvtEntityTrackerCreate.register(registry);
-		EvtEntityTrackerHide.register(registry);
-		EvtEntityTrackerShow.register(registry);
-		EvtModelSpawnAtPlayer.register(registry);
-		EvtModelDespawnAtPlayer.register(registry);
-
-
-		// Register sections
-		SecCreateEntityTracker.register(registry);
-
-		// Register functions
-	}
-
+        SecCreateEntityTracker.register(registry);
+    }
 }

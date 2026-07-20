@@ -9,15 +9,17 @@ import kr.toxicity.model.api.animation.AnimationModifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class TypeAnimationModifier {
+public final class TypeAnimationModifier {
+
+    private TypeAnimationModifier() {}
 
     public static void register() {
-        if (Classes.getExactClassInfo(AnimationModifier.class) == null) {
-            Classes.registerClass(new ClassInfo<>(AnimationModifier.class, "animationmodifier")
+        if (Classes.getExactClassInfo(AnimationModifier.class) != null) return;
+        Classes.registerClass(new ClassInfo<>(AnimationModifier.class, "animationmodifier")
                 .user("animation modifiers?")
                 .name("Animation Modifier")
-                .description("Represents a blueprint animation modifier.")
-                .parser(new Parser<AnimationModifier>() {
+                .description("Represents a built animation modifier with playback settings.")
+                .parser(new Parser<>() {
                     @Override
                     public @Nullable AnimationModifier parse(@NotNull String s, @NotNull ParseContext context) {
                         return null;
@@ -29,27 +31,19 @@ public class TypeAnimationModifier {
                     }
 
                     @Override
-                    public @NotNull String toVariableNameString(AnimationModifier o) {
-                        return "animationmodifier_" +
-                            o.start() + "_" +
-                            o.end() + "_" +
-                            o.priority() + "_" +
-                            (o.type() != null ? o.type().name() : "null") + "_" +
-                            o.speedValue() + "_" +
-                            (o.override() != null ? o.override() : "null");
+                    public @NotNull String toVariableNameString(AnimationModifier modifier) {
+                        return "animationmodifier_" + modifier.start() + "_" + modifier.end()
+                                + "_" + modifier.priority() + "_" + modifier.speedValue();
                     }
 
                     @Override
-                    public @NotNull String toString(AnimationModifier o, int flags) {
-                        return "animation modifier (start=" + o.start() +
-                            ", end=" + o.end() +
-                            ", priority=" + o.priority() +
-                            ", type=" + o.type() +
-                            ", speed=" + o.speedValue() + ")";
+                    public @NotNull String toString(AnimationModifier modifier, int flags) {
+                        return "animation modifier(speed=" + modifier.speedValue()
+                                + ", start=" + modifier.start()
+                                + ", end=" + modifier.end()
+                                + ", priority=" + modifier.priority() + ")";
                     }
-
                 })
-            );
-        }
+        );
     }
 }

@@ -13,14 +13,17 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import kr.toxicity.model.api.tracker.EntityTracker;
+
 public class ExprLastEntityTracker extends SimpleExpression<EntityTracker> {
 
-	public static void register(@NotNull SyntaxRegistry registry) {
-		registry.register(SyntaxRegistry.EXPRESSION, DefaultSyntaxInfos.Expression.builder(ExprLastEntityTracker.class, EntityTracker.class)
-				.supplier(ExprLastEntityTracker::new)
-				.addPatterns("last created [bm|bettermodel] entity tracker") // [example] is optional in syntax
-				.build());
-	}
+    public static void register(@NotNull SyntaxRegistry registry) {
+        registry.register(SyntaxRegistry.EXPRESSION,
+                DefaultSyntaxInfos.Expression.builder(ExprLastEntityTracker.class, EntityTracker.class)
+                        .supplier(ExprLastEntityTracker::new)
+                        .addPatterns("last created [bm|bettermodel] entity tracker")
+                        .build());
+    }
+
     @Override
     public boolean isSingle() {
         return true;
@@ -43,7 +46,7 @@ public class ExprLastEntityTracker extends SimpleExpression<EntityTracker> {
 
     @Override
     protected EntityTracker @Nullable [] get(Event event) {
-        return new EntityTracker[]{SecCreateEntityTracker.lastCreatedEntityTracker};
+        EntityTracker tracker = SecCreateEntityTracker.getLastCreated();
+        return tracker != null ? new EntityTracker[]{tracker} : new EntityTracker[0];
     }
-    
 }

@@ -5,18 +5,21 @@ import ch.njol.skript.classes.Parser;
 import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.registrations.Classes;
 import kr.toxicity.model.api.tracker.EntityTracker;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class TypeEntityTracker {
+public final class TypeEntityTracker {
+
+    private TypeEntityTracker() {}
 
     public static void register() {
-        if (Classes.getExactClassInfo(EntityTracker.class) == null) {
-            Classes.registerClass(new ClassInfo<>(EntityTracker.class, "entitytracker")
+        if (Classes.getExactClassInfo(EntityTracker.class) != null) return;
+        Classes.registerClass(new ClassInfo<>(EntityTracker.class, "entitytracker")
                 .user("entity ?trackers?")
                 .name("Entity Tracker")
-                .description("Represents a BetterModel entity tracker.")
-                .parser(new Parser<EntityTracker>() {
+                .description("Represents a BetterModel entity tracker bound to an entity.")
+                .parser(new Parser<>() {
                     @Override
                     public @Nullable EntityTracker parse(@NotNull String s, @NotNull ParseContext context) {
                         return null;
@@ -28,16 +31,15 @@ public class TypeEntityTracker {
                     }
 
                     @Override
-                    public @NotNull String toString(EntityTracker o, int flags) {
-                        return "entity tracker";
+                    public @NotNull String toString(EntityTracker tracker, int flags) {
+                        return "entity tracker[" + tracker.name() + "]";
                     }
 
                     @Override
-                    public @NotNull String toVariableNameString(EntityTracker o) {
-                        return "entitytracker_" + System.identityHashCode(o);
+                    public @NotNull String toVariableNameString(EntityTracker tracker) {
+                        return "entitytracker_" + tracker.name();
                     }
                 })
-            );
-        }
+        );
     }
 }

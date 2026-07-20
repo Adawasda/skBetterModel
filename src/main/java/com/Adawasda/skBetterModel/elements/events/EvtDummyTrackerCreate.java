@@ -14,13 +14,14 @@ import kr.toxicity.model.api.event.CreateDummyTrackerEvent;
 
 public class EvtDummyTrackerCreate extends SkriptEvent {
 
-	public static void register(@NotNull SyntaxRegistry registry) {
-		registry.register(BukkitSyntaxInfos.Event.KEY, BukkitSyntaxInfos.Event.builder(EvtDummyTrackerCreate.class, "bettermodel dummy tracker create")
-				.supplier(EvtDummyTrackerCreate::new)
-				.addEvent(BetterModelBukkitEvent.class)
-				.addPatterns("[bm|bettermodel] dummy [tracker] (create|spawn)")
-				.build());
-	}
+    public static void register(@NotNull SyntaxRegistry registry) {
+        registry.register(BukkitSyntaxInfos.Event.KEY,
+                BukkitSyntaxInfos.Event.builder(EvtDummyTrackerCreate.class, "bettermodel dummy tracker create")
+                        .supplier(EvtDummyTrackerCreate::new)
+                        .addEvent(BetterModelBukkitEvent.class)
+                        .addPatterns("[bm|bettermodel] dummy [tracker] (create|spawn)")
+                        .build());
+    }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
@@ -34,8 +35,7 @@ public class EvtDummyTrackerCreate extends SkriptEvent {
 
     @Override
     public boolean check(Event event) {
-        BetterModelBukkitEvent e = (BetterModelBukkitEvent) event;
-        return e.is(CreateDummyTrackerEvent.class);
+        return (event instanceof BetterModelBukkitEvent bmEvent)
+                && bmEvent.is(CreateDummyTrackerEvent.class);
     }
-    
 }

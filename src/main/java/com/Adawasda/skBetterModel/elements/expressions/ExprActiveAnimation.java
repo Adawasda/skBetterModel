@@ -1,12 +1,13 @@
 package com.Adawasda.skBetterModel.elements.expressions;
 
 import org.bukkit.entity.Entity;
-
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.DefaultSyntaxInfos;
 import org.skriptlang.skript.registration.SyntaxRegistry;
+
+import com.Adawasda.skBetterModel.core.TrackerController;
 
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -14,46 +15,42 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import kr.toxicity.model.api.animation.RunningAnimation;
 import kr.toxicity.model.api.tracker.EntityTracker;
-import com.Adawasda.skBetterModel.utils.EntityTrackerController;
 
-@SuppressWarnings("unchecked")
 public class ExprActiveAnimation extends SimpleExpression<RunningAnimation> {
 
-    private Expression<Object> expr;
+    private Expression<Object> targetExpr;
 
     public static void register(@NotNull SyntaxRegistry registry) {
-        registry.register(SyntaxRegistry.EXPRESSION, DefaultSyntaxInfos.Expression.builder(ExprActiveAnimation.class, RunningAnimation.class)
-                .supplier(ExprActiveAnimation::new)
-                .addPatterns("[active|running] animation of %object%")
-                .build());
+        registry.register(SyntaxRegistry.EXPRESSION,
+                DefaultSyntaxInfos.Expression.builder(ExprActiveAnimation.class, RunningAnimation.class)
+                        .supplier(ExprActiveAnimation::new)
+                        .addPatterns("[active|running] animation of %object%")
+                        .build());
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-        this.expr = (Expression<Object>) expressions[0];
+        this.targetExpr = (Expression<Object>) expressions[0];
         return true;
     }
 
     @Override
     protected RunningAnimation @Nullable [] get(Event event) {
-        Object obj = expr.getSingle(event);
-        if (obj == null) return null;
+        Object target = targetExpr.getSingle(event);
+        if (target == null) return null;
 
-        EntityTracker tracker;
-        if (obj instanceof EntityTracker entityTracker) {
-            tracker = entityTracker;
-        } else if (obj instanceof Entity entity) {
-            tracker = new EntityTrackerController(entity).getTracker();
+        TrackerController controller;
+        if (target instanceof EntityTracker tracker) {
+            controller = TrackerController.wrap(tracker);
+        } else if (target instanceof Entity entity) {
+            controller = TrackerController.fromExisting(entity);
         } else {
             return null;
         }
 
-        if (tracker == null) return null;
-
-        RunningAnimation animation = tracker.getPipeline().runningAnimation();
-        if (animation == null) return null;
-
-        return new RunningAnimation[]{animation};
+        RunningAnimation animation = controller.getRunningAnimation();
+        return animation != null ? new RunningAnimation[]{animation} : null;
     }
 
     @Override
@@ -68,6 +65,6 @@ public class ExprActiveAnimation extends SimpleExpression<RunningAnimation> {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "active animation of " + expr.toString(event, debug);
+        return "active animation of " + targetExpr.toString(event, debug);
     }
 }

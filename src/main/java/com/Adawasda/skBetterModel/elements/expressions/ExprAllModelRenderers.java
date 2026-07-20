@@ -16,10 +16,11 @@ import kr.toxicity.model.api.data.renderer.ModelRenderer;
 public class ExprAllModelRenderers extends SimpleExpression<ModelRenderer> {
 
     public static void register(@NotNull SyntaxRegistry registry) {
-        registry.register(SyntaxRegistry.EXPRESSION, DefaultSyntaxInfos.Expression.builder(ExprAllModelRenderers.class, ModelRenderer.class)
-                .supplier(ExprAllModelRenderers::new)
-                .addPatterns("all [bm|bettermodel] [renderer] models")
-                .build());
+        registry.register(SyntaxRegistry.EXPRESSION,
+                DefaultSyntaxInfos.Expression.builder(ExprAllModelRenderers.class, ModelRenderer.class)
+                        .supplier(ExprAllModelRenderers::new)
+                        .addPatterns("all [bm|bettermodel] [renderer] models")
+                        .build());
     }
 
     @Override
@@ -44,6 +45,6 @@ public class ExprAllModelRenderers extends SimpleExpression<ModelRenderer> {
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
-        return "all blueprints";
+        return "all model renderers";
     }
 }

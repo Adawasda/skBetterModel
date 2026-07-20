@@ -1,4 +1,4 @@
-package com.Adawasda.skBetterModel.elements.expressions.properties.modifier;
+package com.Adawasda.skBetterModel.elements.expressions.properties.bone;
 
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -6,12 +6,12 @@ import org.jetbrains.annotations.Nullable;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import kr.toxicity.model.api.animation.AnimationModifier;
+import kr.toxicity.model.api.bone.RenderedBone;
 
-public class ExprModifierSpeed extends SimplePropertyExpression<AnimationModifier.Builder, Number> {
+public class ExprBoneScale extends SimplePropertyExpression<RenderedBone, Number> {
 
     public static void register() {
-        PropertyExpression.register(ExprModifierSpeed.class, Number.class, "speed", "modifier");
+        PropertyExpression.register(ExprBoneScale.class, Number.class, "bone scale", "renderedbone");
     }
 
     @Override
@@ -20,29 +20,29 @@ public class ExprModifierSpeed extends SimplePropertyExpression<AnimationModifie
     }
 
     @Override
-    public @Nullable Number convert(AnimationModifier.Builder builder) {
-        return builder.build().speedValue();
+    public @Nullable Number convert(RenderedBone bone) {
+        return 1.0f;
     }
 
     @Override
     public @Nullable Class<?>[] acceptChange(ChangeMode mode) {
         return switch (mode) {
-            case SET, RESET, DELETE -> new Class[]{Number.class};
+            case SET, RESET -> new Class[]{Number.class};
             default -> null;
         };
     }
 
     @Override
     public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-        for (AnimationModifier.Builder builder : getExpr().getArray(event)) {
+        for (RenderedBone bone : getExpr().getArray(event)) {
             float value = (mode == ChangeMode.SET && delta != null)
                     ? ((Number) delta[0]).floatValue() : 1f;
-            builder.speed(value);
+            bone.scale(() -> value);
         }
     }
 
     @Override
     protected String getPropertyName() {
-        return "speed";
+        return "bone scale";
     }
 }

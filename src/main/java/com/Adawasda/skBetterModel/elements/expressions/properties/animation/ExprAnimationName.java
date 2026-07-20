@@ -18,9 +18,8 @@ public class ExprAnimationName extends SimplePropertyExpression<RunningAnimation
     }
 
     @Override
-    public @Nullable String convert(RunningAnimation from) {
-        if (from == null) return null;
-        return from.name();
+    public @Nullable String convert(RunningAnimation animation) {
+        return animation != null ? animation.name() : null;
     }
 
     @Override

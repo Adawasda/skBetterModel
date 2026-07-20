@@ -9,18 +9,19 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import kr.toxicity.model.api.event.PluginEndReloadEvent;
 import kr.toxicity.model.api.bukkit.event.BetterModelBukkitEvent;
+import kr.toxicity.model.api.event.PluginStartReloadEvent;
 
 public class EvtBMReloadStart extends SkriptEvent {
 
-	public static void register(@NotNull SyntaxRegistry registry) {
-		registry.register(BukkitSyntaxInfos.Event.KEY, BukkitSyntaxInfos.Event.builder(EvtBMReloadStart.class, "bettermodel reload start event")
-				.supplier(EvtBMReloadStart::new)
-				.addEvent(BetterModelBukkitEvent.class)
-				.addPatterns("(bm|bettermodel) reload start[ing]")
-				.build());
-	}
+    public static void register(@NotNull SyntaxRegistry registry) {
+        registry.register(BukkitSyntaxInfos.Event.KEY,
+                BukkitSyntaxInfos.Event.builder(EvtBMReloadStart.class, "bettermodel reload start event")
+                        .supplier(EvtBMReloadStart::new)
+                        .addEvent(BetterModelBukkitEvent.class)
+                        .addPatterns("(bm|bettermodel) reload start[ing]")
+                        .build());
+    }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
@@ -34,8 +35,7 @@ public class EvtBMReloadStart extends SkriptEvent {
 
     @Override
     public boolean check(Event event) {
-        BetterModelBukkitEvent e = (BetterModelBukkitEvent) event;
-        return e.is(PluginEndReloadEvent.class);
+        return (event instanceof BetterModelBukkitEvent bmEvent)
+                && bmEvent.is(PluginStartReloadEvent.class);
     }
-    
 }

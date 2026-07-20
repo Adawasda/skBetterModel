@@ -1,17 +1,19 @@
-package com.Adawasda.skBetterModel.elements.expressions.properties.modifier;
+package com.Adawasda.skBetterModel.elements.expressions.properties.tracker;
 
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 
+import com.Adawasda.skBetterModel.core.TrackerController;
+
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import kr.toxicity.model.api.animation.AnimationModifier;
+import kr.toxicity.model.api.tracker.EntityTracker;
 
-public class ExprModifierStart extends SimplePropertyExpression<AnimationModifier.Builder, Number> {
+public class ExprTrackerViewRange extends SimplePropertyExpression<EntityTracker, Number> {
 
     public static void register() {
-        PropertyExpression.register(ExprModifierStart.class, Number.class, "start", "modifier");
+        PropertyExpression.register(ExprTrackerViewRange.class, Number.class, "[bm] view range", "entitytracker");
     }
 
     @Override
@@ -20,29 +22,30 @@ public class ExprModifierStart extends SimplePropertyExpression<AnimationModifie
     }
 
     @Override
-    public @Nullable Number convert(AnimationModifier.Builder builder) {
-        return builder.build().start();
+    public @Nullable Number convert(EntityTracker tracker) {
+        return 0;
     }
 
     @Override
     public @Nullable Class<?>[] acceptChange(ChangeMode mode) {
         return switch (mode) {
-            case SET, RESET, DELETE -> new Class[]{Number.class};
+            case SET, RESET -> new Class[]{Number.class};
             default -> null;
         };
     }
 
     @Override
     public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-        for (AnimationModifier.Builder builder : getExpr().getArray(event)) {
+        for (EntityTracker tracker : getExpr().getArray(event)) {
+            TrackerController controller = TrackerController.wrap(tracker);
             int value = (mode == ChangeMode.SET && delta != null)
                     ? ((Number) delta[0]).intValue() : 0;
-            builder.start(value);
+            controller.setViewRange(value);
         }
     }
 
     @Override
     protected String getPropertyName() {
-        return "start";
+        return "view range";
     }
 }

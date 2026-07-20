@@ -14,13 +14,14 @@ import kr.toxicity.model.api.event.PlayerShowTrackerEvent;
 
 public class EvtEntityTrackerShow extends SkriptEvent {
 
-	public static void register(@NotNull SyntaxRegistry registry) {
-		registry.register(BukkitSyntaxInfos.Event.KEY, BukkitSyntaxInfos.Event.builder(EvtEntityTrackerShow.class, "bettermodel entity tracker show event")
-				.supplier(EvtEntityTrackerShow::new)
-				.addEvent(BetterModelBukkitEvent.class)
-				.addPatterns("[bm|bettermodel] [entity] tracker show [for player]")
-				.build());
-	}
+    public static void register(@NotNull SyntaxRegistry registry) {
+        registry.register(BukkitSyntaxInfos.Event.KEY,
+                BukkitSyntaxInfos.Event.builder(EvtEntityTrackerShow.class, "bettermodel entity tracker show event")
+                        .supplier(EvtEntityTrackerShow::new)
+                        .addEvent(BetterModelBukkitEvent.class)
+                        .addPatterns("[bm|bettermodel] [entity] tracker show [for player]")
+                        .build());
+    }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
@@ -34,8 +35,7 @@ public class EvtEntityTrackerShow extends SkriptEvent {
 
     @Override
     public boolean check(Event event) {
-        BetterModelBukkitEvent e = (BetterModelBukkitEvent) event;
-        return e.is(PlayerShowTrackerEvent.class);
+        return (event instanceof BetterModelBukkitEvent bmEvent)
+                && bmEvent.is(PlayerShowTrackerEvent.class);
     }
-    
 }

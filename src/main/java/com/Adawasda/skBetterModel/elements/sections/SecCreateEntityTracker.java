@@ -9,53 +9,51 @@ import org.bukkit.event.Event;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import org.skriptlang.skript.lang.entry.util.ExpressionEntryData;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.config.SectionNode;
+import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.Section;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.TriggerItem;
+import ch.njol.skript.util.Color;
+import ch.njol.util.Kleenean;
 
 import org.skriptlang.skript.lang.entry.EntryContainer;
 import org.skriptlang.skript.lang.entry.EntryValidator;
 
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.Section;
-import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.util.Color;
-import ch.njol.skript.lang.TriggerItem;
-import ch.njol.util.Kleenean;
-import kr.toxicity.model.api.BetterModel;
 import kr.toxicity.model.api.animation.AnimationIterator;
 import kr.toxicity.model.api.animation.AnimationModifier;
-import kr.toxicity.model.api.bukkit.platform.BukkitAdapter;
-import kr.toxicity.model.api.platform.PlatformEntity;
 import kr.toxicity.model.api.tracker.EntityTracker;
-import kr.toxicity.model.api.tracker.ModelScaler;
-import kr.toxicity.model.api.tracker.TrackerUpdateAction;
-import com.Adawasda.skBetterModel.utils.EntityTrackerController;
-import com.Adawasda.skBetterModel.utils.skBetterModelConfig;
-import com.Adawasda.skBetterModel.utils.utils;
 
-@SuppressWarnings("unused")
+import com.Adawasda.skBetterModel.core.TrackerController;
+import com.Adawasda.skBetterModel.utils.ColorUtils;
+import com.Adawasda.skBetterModel.utils.PluginConfig;
+
 public class SecCreateEntityTracker extends Section {
 
-    public static EntityTracker lastCreatedEntityTracker;
+    private static @Nullable EntityTracker lastCreated;
 
-    private Expression<String> modelName;
+    public static @Nullable EntityTracker getLastCreated() {
+        return lastCreated;
+    }
+
+    private Expression<String> modelNameExpr;
 
     private Expression<Entity> entityExpr;
+    private Expression<OfflinePlayer> playerExpr;
     private Expression<Vector> scaleExpr;
     private Expression<String> startAnimationExpr;
-
+    private Expression<Vector> offsetExpr;
     private Expression<Number> brightnessExpr;
     private Expression<Boolean> glowExpr;
     private Expression<Color> glowColorExpr;
     private Expression<Number> viewRangeExpr;
     private Expression<Color> tintExpr;
-    private Expression<Object> playerExpr;
-    private Expression<Vector> offsetExpr;
+    private Expression<Billboard> billboardExpr;
 
     private Expression<Number> minBodyExpr;
     private Expression<Number> maxBodyExpr;
@@ -65,22 +63,19 @@ public class SecCreateEntityTracker extends Section {
     private Expression<Boolean> headUnevenExpr;
     private Expression<Number> rotationDurationExpr;
     private Expression<Number> rotationDelayExpr;
-    private Expression<Billboard> billboardExpr;
 
-    private static final EntryValidator validator = EntryValidator.builder()
-            .addEntryData(new ExpressionEntryData<>("entity", null, true, Entity.class))
+    private static final EntryValidator VALIDATOR = EntryValidator.builder()
+            .addEntryData(new ExpressionEntryData<>("entity", null, false, Entity.class))
+            .addEntryData(new ExpressionEntryData<>("player", null, true, OfflinePlayer.class))
             .addEntryData(new ExpressionEntryData<>("start animation", null, true, String.class))
             .addEntryData(new ExpressionEntryData<>("scale", null, true, Vector.class))
+            .addEntryData(new ExpressionEntryData<>("offset", null, true, Vector.class))
             .addEntryData(new ExpressionEntryData<>("brightness", null, true, Number.class))
             .addEntryData(new ExpressionEntryData<>("glow", null, true, Boolean.class))
             .addEntryData(new ExpressionEntryData<>("glow color", null, true, Color.class))
             .addEntryData(new ExpressionEntryData<>("view range", null, true, Number.class))
             .addEntryData(new ExpressionEntryData<>("tint", null, true, Color.class))
-            .addEntryData(new ExpressionEntryData<>("player", null, true, OfflinePlayer.class))
-            .addEntryData(new ExpressionEntryData<>("offset", null, true, Vector.class))
             .addEntryData(new ExpressionEntryData<>("billboard", null, true, Billboard.class))
-
-            // Body Rotator
             .addEntryData(new ExpressionEntryData<>("min body", null, true, Number.class))
             .addEntryData(new ExpressionEntryData<>("max body", null, true, Number.class))
             .addEntryData(new ExpressionEntryData<>("min head", null, true, Number.class))
@@ -89,21 +84,19 @@ public class SecCreateEntityTracker extends Section {
             .addEntryData(new ExpressionEntryData<>("head uneven", null, true, Boolean.class))
             .addEntryData(new ExpressionEntryData<>("rotation duration", null, true, Number.class))
             .addEntryData(new ExpressionEntryData<>("rotation delay", null, true, Number.class))
-
             .build();
 
     public static void register(@NotNull SyntaxRegistry registry) {
         registry.register(SyntaxRegistry.SECTION, SyntaxInfo.builder(SecCreateEntityTracker.class)
                 .supplier(SecCreateEntityTracker::new)
-                .addPatterns("create entity tracker with model %string%")
-                .build()
-        );
+                .addPatterns("create [bm|bettermodel] entity tracker with model %string%")
+                .build());
     }
 
     @Override
     public String toString(@Nullable Event event, boolean debug) {
         return "create entity tracker with model " +
-                (modelName != null ? modelName.toString(event, debug) : "null");
+                (modelNameExpr != null ? modelNameExpr.toString(event, debug) : "null");
     }
 
     @SuppressWarnings("unchecked")
@@ -112,31 +105,26 @@ public class SecCreateEntityTracker extends Section {
                         Kleenean isDelayed, ParseResult parseResult,
                         SectionNode sectionNode, List<TriggerItem> triggerItems) {
 
-        EntryContainer container = validator.validate(sectionNode);
-
-        modelName = (Expression<String>) expressions[0];
-
-        if (modelName == null) {
-            Skript.error("No model name provided.");
+        modelNameExpr = (Expression<String>) expressions[0];
+        if (modelNameExpr == null) {
+            Skript.error("Model name is required.");
             return false;
         }
 
-        if (container == null)
-            return false;
+        EntryContainer container = VALIDATOR.validate(sectionNode);
+        if (container == null) return false;
 
         entityExpr = (Expression<Entity>) container.getOptional("entity", Expression.class, true);
+        playerExpr = (Expression<OfflinePlayer>) container.getOptional("player", Expression.class, true);
         startAnimationExpr = (Expression<String>) container.getOptional("start animation", Expression.class, true);
         scaleExpr = (Expression<Vector>) container.getOptional("scale", Expression.class, true);
+        offsetExpr = (Expression<Vector>) container.getOptional("offset", Expression.class, true);
         brightnessExpr = (Expression<Number>) container.getOptional("brightness", Expression.class, true);
         glowExpr = (Expression<Boolean>) container.getOptional("glow", Expression.class, true);
         glowColorExpr = (Expression<Color>) container.getOptional("glow color", Expression.class, true);
         viewRangeExpr = (Expression<Number>) container.getOptional("view range", Expression.class, true);
         tintExpr = (Expression<Color>) container.getOptional("tint", Expression.class, true);
-        playerExpr = (Expression<Object>) container.getOptional("player", Expression.class, true);
-        offsetExpr = (Expression<Vector>) container.getOptional("offset", Expression.class, true);
         billboardExpr = (Expression<Billboard>) container.getOptional("billboard", Expression.class, true);
-
-        // Body Rotator
         minBodyExpr = (Expression<Number>) container.getOptional("min body", Expression.class, true);
         maxBodyExpr = (Expression<Number>) container.getOptional("max body", Expression.class, true);
         minHeadExpr = (Expression<Number>) container.getOptional("min head", Expression.class, true);
@@ -145,6 +133,11 @@ public class SecCreateEntityTracker extends Section {
         headUnevenExpr = (Expression<Boolean>) container.getOptional("head uneven", Expression.class, true);
         rotationDurationExpr = (Expression<Number>) container.getOptional("rotation duration", Expression.class, true);
         rotationDelayExpr = (Expression<Number>) container.getOptional("rotation delay", Expression.class, true);
+
+        if (entityExpr == null) {
+            Skript.error("Entity entry is required.");
+            return false;
+        }
 
         return true;
     }
@@ -157,98 +150,149 @@ public class SecCreateEntityTracker extends Section {
     }
 
     private void execute(Event event) {
-
-        String model = modelName.getSingle(event);
+        String model = modelNameExpr.getSingle(event);
         Entity entity = entityExpr.getSingle(event);
-        if (entity == null) {
-            Skript.error("Entity cannot be null!");
-            return;
+        if (model == null || entity == null) return;
+
+        PluginConfig config = PluginConfig.get();
+
+        OfflinePlayer player = resolve(playerExpr, event);
+        TrackerController controller;
+
+        if (player != null) {
+            controller = TrackerController.fromLimb(entity, model, player);
+        } else {
+            controller = TrackerController.fromModel(entity, model);
         }
 
-        skBetterModelConfig config = skBetterModelConfig.get();
+        if (!controller.isValid()) return;
 
-        String startAnimation = startAnimationExpr != null ? startAnimationExpr.getSingle(event) : null;
-        
-        float minBody = minBodyExpr != null ? minBodyExpr.getSingle(event).floatValue() : config.getMinBody();
-        float maxBody = maxBodyExpr != null ? maxBodyExpr.getSingle(event).floatValue() : config.getMaxBody();
-        float minHead = minHeadExpr != null ? minHeadExpr.getSingle(event).floatValue() : config.getMinHead();
-        float maxHead = maxHeadExpr != null ? maxHeadExpr.getSingle(event).floatValue() : config.getMaxHead();
-        boolean bodyUneven = bodyUnevenExpr != null ? bodyUnevenExpr.getSingle(event).booleanValue() : config.isBodyUneven();
-        boolean headUneven = headUnevenExpr != null ? headUnevenExpr.getSingle(event).booleanValue() : config.isHeadUneven();
-        int rotationDuration = rotationDurationExpr != null ? rotationDurationExpr.getSingle(event).intValue() : config.getRotationDuration();
-        int rotationDelay = rotationDelayExpr != null ? rotationDelayExpr.getSingle(event).intValue() : config.getRotationDelay();
+        applyScale(controller, event);
+        applyBrightness(controller, event);
+        applyGlow(controller, event);
+        applyGlowColor(controller, event);
+        applyViewRange(controller, event);
+        applyTint(controller, event);
+        applyBillboard(controller, event);
+        applyRotatorData(controller, event, config);
+        applyOffset(controller, event);
+        applyStartAnimation(controller, event);
 
-        EntityTrackerController controller;
+        lastCreated = controller.getTracker();
+    }
 
-
-        if (model == null || entity == null)
-            return;
-
-        if (playerExpr != null && playerExpr.getSingle(event) != null) 
-            controller = new EntityTrackerController(entity, model, (OfflinePlayer) playerExpr.getSingle(event));
-        else 
-            controller = new EntityTrackerController(entity, model);
-        
-        
-
-        if (scaleExpr != null && scaleExpr.getSingle(event) != null) {
-            float scale = (float) scaleExpr.getSingle(event).getX();
-            controller.setScale(scale);
+    private void applyScale(TrackerController controller, Event event) {
+        Vector scale = resolve(scaleExpr, event);
+        if (scale != null) {
+            controller.setScale((float) scale.getX());
         }
+    }
 
-        if (brightnessExpr != null && brightnessExpr.getSingle(event) != null) {
-            int brightness = brightnessExpr.getSingle(event).intValue();
-            controller.setBrightness(brightness, brightness);
+    private void applyBrightness(TrackerController controller, Event event) {
+        Number brightness = resolve(brightnessExpr, event);
+        if (brightness != null) {
+            int val = brightness.intValue();
+            controller.setBrightness(val, val);
         }
+    }
 
-        if (glowExpr != null && glowExpr.getSingle(event) != null) {
-            controller.setGlow(glowExpr.getSingle(event));
+    private void applyGlow(TrackerController controller, Event event) {
+        Boolean glow = resolve(glowExpr, event);
+        if (glow != null) {
+            controller.setGlow(glow);
         }
+    }
 
-        if (glowColorExpr != null && glowColorExpr.getSingle(event) != null) {
-            Color c = glowColorExpr.getSingle(event);
-            controller.setGlowColor(utils.rgbToInt(c.getRed(), c.getGreen(), c.getBlue()));
+    private void applyGlowColor(TrackerController controller, Event event) {
+        Color color = resolve(glowColorExpr, event);
+        if (color != null) {
+            controller.setGlowColor(ColorUtils.fromSkriptColor(color));
         }
+    }
 
-        if (viewRangeExpr != null && viewRangeExpr.getSingle(event) != null) {
-            controller.setViewRange(viewRangeExpr.getSingle(event).intValue());
+    private void applyViewRange(TrackerController controller, Event event) {
+        Number range = resolve(viewRangeExpr, event);
+        if (range != null) {
+            controller.setViewRange(range.intValue());
         }
+    }
 
-        if (tintExpr != null && tintExpr.getSingle(event) != null) {
-            Color c = tintExpr.getSingle(event);
-            controller.setTint(utils.rgbToInt(c.getRed(), c.getGreen(), c.getBlue()));
+    private void applyTint(TrackerController controller, Event event) {
+        Color color = resolve(tintExpr, event);
+        if (color != null) {
+            controller.setTint(ColorUtils.fromSkriptColor(color));
         }
+    }
 
-        if (billboardExpr != null && billboardExpr.getSingle(event) != null) {
-            controller.setBillboard(billboardExpr.getSingle(event));
+    private void applyBillboard(TrackerController controller, Event event) {
+        Billboard billboard = resolve(billboardExpr, event);
+        if (billboard != null) {
+            controller.setBillboard(billboard);
         }
-        
-        controller.setValue(d -> {
-            d.setMinBody(minBody);
-            d.setMaxBody(maxBody);
-            d.setMinHead(minHead);
-            d.setMaxHead(maxHead);
-            d.setBodyUneven(bodyUneven);
-            d.setHeadUneven(headUneven);
-            d.setRotationDuration(rotationDuration);
-            d.setRotationDelay(rotationDelay);
+    }
+
+    private void applyRotatorData(TrackerController controller, Event event, PluginConfig config) {
+        float minBody = resolveFloat(minBodyExpr, event, config.getMinBody());
+        float maxBody = resolveFloat(maxBodyExpr, event, config.getMaxBody());
+        float minHead = resolveFloat(minHeadExpr, event, config.getMinHead());
+        float maxHead = resolveFloat(maxHeadExpr, event, config.getMaxHead());
+        boolean bodyUneven = resolveBoolean(bodyUnevenExpr, event, config.isBodyUneven());
+        boolean headUneven = resolveBoolean(headUnevenExpr, event, config.isHeadUneven());
+        int rotDuration = resolveInt(rotationDurationExpr, event, config.getRotationDuration());
+        int rotDelay = resolveInt(rotationDelayExpr, event, config.getRotationDelay());
+
+        controller.setRotatorData(data -> {
+            data.setMinBody(minBody);
+            data.setMaxBody(maxBody);
+            data.setMinHead(minHead);
+            data.setMaxHead(maxHead);
+            data.setBodyUneven(bodyUneven);
+            data.setHeadUneven(headUneven);
+            data.setRotationDuration(rotDuration);
+            data.setRotationDelay(rotDelay);
         });
+    }
 
-        if (offsetExpr != null && offsetExpr.getSingle(event) != null) {
-            controller.setOffset(offsetExpr.getSingle(event).toVector3f());
+    private void applyOffset(TrackerController controller, Event event) {
+        Vector offset = resolve(offsetExpr, event);
+        if (offset != null) {
+            controller.setOffset(offset.toVector3f());
         }
-        if (startAnimation != null) {
-            controller.animate(startAnimation,         
-                AnimationModifier.builder()  
-                    .override(true)
-                    .start(0)  
-                    .end(0)
-                    .type(AnimationIterator.Type.PLAY_ONCE)  
-                    .build()  
-                ,true);
-        }
-        lastCreatedEntityTracker = controller.getTracker();
+    }
 
-        
+    private void applyStartAnimation(TrackerController controller, Event event) {
+        String animation = resolve(startAnimationExpr, event);
+        if (animation != null) {
+            controller.animate(animation,
+                    AnimationModifier.builder()
+                            .override(true)
+                            .start(0)
+                            .end(0)
+                            .type(AnimationIterator.Type.PLAY_ONCE)
+                            .build(),
+                    true);
+        }
+    }
+
+    private static <T> @Nullable T resolve(@Nullable Expression<T> expr, Event event) {
+        return expr != null ? expr.getSingle(event) : null;
+    }
+
+    private static float resolveFloat(@Nullable Expression<Number> expr, Event event, float fallback) {
+        if (expr == null) return fallback;
+        Number val = expr.getSingle(event);
+        return val != null ? val.floatValue() : fallback;
+    }
+
+    private static int resolveInt(@Nullable Expression<Number> expr, Event event, int fallback) {
+        if (expr == null) return fallback;
+        Number val = expr.getSingle(event);
+        return val != null ? val.intValue() : fallback;
+    }
+
+    private static boolean resolveBoolean(@Nullable Expression<Boolean> expr, Event event, boolean fallback) {
+        if (expr == null) return fallback;
+        Boolean val = expr.getSingle(event);
+        return val != null ? val : fallback;
     }
 }
